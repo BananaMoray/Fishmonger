@@ -1,0 +1,11 @@
+{
+	"name": "Fishmonger",
+	"version_number": "1.0.0",
+	"website_url": "",
+	"description": "Adds Fishmonger as a playable character.",
+	"dependencies": [
+		"ReturnOfModding-ReturnOfModding-1.0.32",
+    "Klehrik-HelperFunctions-1.0.9",
+	"RoRRModdingToolkit-RoRR_Modding_Toolkit-1.0.6"
+	]
+}
