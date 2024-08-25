@@ -46,7 +46,7 @@ __initialize = function()
     local jump_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerJump.png"), 2, false, false, 24, 19)
     local jumpfall_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerFall.png"), 1, false, false, 24, 19)
     local walk_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerWalk.png"), 10, false, false, 24, 19)
-    local climb_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerClimb.png"), 2, false, false, 24, 19)
+    local climb_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerClimb.png"), 6, false, false, 24, 19)
 
     local attack1_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerAttack1.png"), 5, false, false, 75, 51,2)
     -- bait bucket --
