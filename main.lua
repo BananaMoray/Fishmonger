@@ -1,3 +1,4 @@
+
 -- Fishmonger v1.0.0
 -- Frithuritaks feat. SmoothSpatula
 log.info("Successfully loaded ".._ENV["!guid"]..".")
@@ -13,6 +14,8 @@ mods.on_all_mods_loaded(function()
             Player = m.Player
             Survivor = m.Survivor
             Resources = m.Resources
+            Actor = m.Actor
+            Alarm = m.Alarm
             break
         end
     end
@@ -46,7 +49,7 @@ __initialize = function()
     local jump_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerJump.png"), 2, false, false, 24, 19)
     local jumpfall_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerFall.png"), 1, false, false, 24, 19)
     local walk_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerWalk.png"), 10, false, false, 24, 19)
-    local climb_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerClimb.png"), 6, false, false, 24, 19)
+    local climb_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerClimb.png"), 6, false, false, 15, 19, 3)
 
     local attack1_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerAttack1.png"), 5, false, false, 75, 51,2)
     -- bait bucket --
@@ -111,7 +114,7 @@ __initialize = function()
     Fish, Fish_id = Survivor.setup_survivor(
         "FishedMongered", "fish", "Fishmonger", "The <y>Fishmonger</c> is here?!", "...",
         loadout_sprite, portrait_sprite, portraitsmall_sprite, loadout_sprite,
-        walk_sprite, idle_sprite, death_sprite, jump_sprite, jumpfall_sprite, jumpfall_sprite, nil,
+        walk_sprite, idle_sprite, death_sprite, jump_sprite, jumpfall_sprite, jumpfall_sprite, climb_sprite,
         {["r"]=238, ["g"] = 173, ["b"] = 105}, {[1] = 0.0, [2] = -9.0, [3] = 3.0}
     )
     -- function setup_stats(survivor_id, armor, attack_speed, movement_speed, critical_chance, damage, hp_regen, maxhp, maxbarrier, maxshield, maxhp_cap, jump_force)
@@ -127,11 +130,11 @@ __initialize = function()
     -- cooldown, damage, is_primary, skill_id)
     Survivor.setup_skill(Fish.skill_family_z[0], "Fishing Rod", "Whip opponents and keep them at a distance.", 
         skills_sprite, 1, attack1_sprite,
-        1.0, 3.0, false, 27)
+        1.0, 100.0, true, 160)
 
     Fish.skill_family_z[0].does_change_activity_state = false
     Fish.skill_family_z[0].override_strafe_direction = false
-    Fish.skill_family_z[0].require_key_press = true
+    Fish.skill_family_z[0].require_key_press = false
 
     Survivor.setup_skill(Fish.skill_family_x[0], "Fishing Rod Double Deluxe ++", "Turns enemies into <y>burgers</c>. That's lowkey <y>fucked up</c> ngl.", 
         skills_sprite, 1, idle_sprite,
@@ -152,88 +155,37 @@ __initialize = function()
     Survivor.setup_empty_skill(Fish.skill_family_v[0])
 
     -- == Section callbacks == --
-    -- offset = 
 
     -- attacking
+
+    local custom_sprite = 0
     gm.pre_script_hook(gm.constants.callback_execute, function(self, other, result, args)
         if self.class ~= Fish_id then return end
         if args[1].value == Fish.skill_family_z[0].on_activate then
             self.sprite_index = attack1_sprite
             gm.sound_play_at(gm.constants.wMercenaryShoot1_3, 1, 1, self.x, self.y, 500)
-            print("whipper")
-            local attack_offset = 80
+            local attack_offset = 50
             if gm.actor_get_facing_direction(self) == 180 then 
                 attack_offset = -attack_offset
             end
-        gm._mod_attack_fire_explosion(
-            self,
-            self.x + attack_offset,
-            self.y - 15,
-            80,
-            35,
-            self.skills[1].active_skill.damage,
-            bullet_sprite,
-            bullet_sprite,
-            true)
+            Actor.fire_explosion(self, self.x + attack_offset, self.y, 25, 25, 100, 1, 85)
+            custom_sprite = custom_sprite +1
         end
     end)
 
-    gm.post_script_hook(gm.constants.instance_create_depth, function(self, other, result, args)
-        if self.class ~= Fish_id then return end
-        if result.value.object_name == "oArtiSnap" then
-            result.value.sprite_idle = bait_sprite
-            print("get bucket")
-        end
-    end)
-
-
-    local function onDeath(self)
-        if Helper.get_client_player().m_id < 2.0 then
-            local head = gm.instance_create_depth(self.x, self.y - 15, 1, gm.constants.oEfNugget)
-            local arm1 = gm.instance_create_depth(self.x, self.y - 15, 1, gm.constants.oEfNugget)
-            local arm2 = gm.instance_create_depth(self.x, self.y - 15, 1, gm.constants.oEfNugget)
-            local leg1 = gm.instance_create_depth(self.x, self.y - 15, 1, gm.constants.oEfNugget)
-            local leg2 = gm.instance_create_depth(self.x, self.y - 15, 1, gm.constants.oEfNugget)
-
-            print_struct(arm1)
-
-            head.is_Fish_part = 1.0
-            arm1.is_Fish_part = 1.0
-            arm2.is_Fish_part = 1.0
-            leg1.is_Fish_part = 1.0
-            leg2.is_Fish_part = 1.0
-
-            head.image_xscale = 2.0
-            arm1.image_xscale = 2.0
-            arm2.image_xscale = 2.0
-            leg1.image_xscale = 2.0
-            leg2.image_xscale = 2.0
-
-            head.image_yscale = 2.0
-            arm1.image_yscale = 2.0
-            arm2.image_yscale = 2.0
-            leg1.image_yscale = 2.0
-            leg2.image_yscale = 2.0
-            
-            head.sprite_index = PartsHead_sprite
-            arm1.sprite_index = PartsArm_sprite
-            arm2.sprite_index = PartsArm_sprite
-            leg1.sprite_index = PartsLeg_sprite
-            leg2.sprite_index = PartsLeg_sprite
-
-            for i=1, body_parts do
-                local part = gm.instance_create_depth(self.x, self.y - 15, 1, gm.constants.oEfNugget)
-                part.sprite_index = PartsBody_sprite
-                part.image_speed = 0
-                part.image_xscale = 2.0
-                part.image_yscale = 2.0
-                part.image_index = i
-                part.is_Fish_part = 1.0
-            end
-        end
+    local function setBucket(inst)
+        if inst.parent.class ~= Fish_id then return end
+        inst.sprite_index = bait_sprite
+        inst.sprite_idle = bait_sprite
     end
 
-    Survivor.add_callback(Fish_id, "onPlayerInit", Fish_init)
-    Survivor.add_callback(Fish_id, "onPlayerStep", onFishStep)
-    Survivor.add_callback(Fish_id, "onPlayerDeath", onDeath)
+    gm.post_script_hook(gm.constants.instance_create_depth, function(self, other, result, args)
+        if result.value.object_name == "oArtiSnap" then
+            Alarm.create(setBucket, 1, result.value, other)
+            Alarm.create(setBucket, 2, result.value, other)
+        end
+    end)
+
+    --Survivor.add_callback(Fish_id, "onPlayerInit", Fish_init)
+    --Survivor.add_callback(Fish_id, "onPlayerStep", onFishStep)
 end
