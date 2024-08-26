@@ -49,7 +49,7 @@ __initialize = function()
     local jump_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerJump.png"), 2, false, false, 24, 19)
     local jumpfall_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerFall.png"), 1, false, false, 24, 19)
     local walk_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerWalk.png"), 10, false, false, 24, 19)
-    local climb_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerClimb.png"), 6, false, false, 15, 19, 3)
+    local climb_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerClimb.png"), 6, false, false, 18, 19, 3)
 
     local attack1_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerAttack1.png"), 5, false, false, 75, 51,2)
     -- bait bucket --
@@ -118,7 +118,7 @@ __initialize = function()
         {["r"]=238, ["g"] = 173, ["b"] = 105}, {[1] = 0.0, [2] = -9.0, [3] = 3.0}
     )
     -- function setup_stats(survivor_id, armor, attack_speed, movement_speed, critical_chance, damage, hp_regen, maxhp, maxbarrier, maxshield, maxhp_cap, jump_force)
-    Survivor.setup_stats(Fish_id, nil, 1.0, nil, 1.0, nil, nil, 160,  nil, nil, nil, jump_force)
+    Survivor.setup_stats(Fish_id, nil, 1.0, nil, 1.0, nil, nil, 110,  nil, nil, nil, jump_force)
 
     -- function setup_level_stats(survivor_id, armor_level, attack_speed_level, critical_chance_level, damage_level, hp_regen_level, maxhp_level)
     Survivor.setup_level_stats(Fish_id, nil, nil, nil, nil, nil, nil)
