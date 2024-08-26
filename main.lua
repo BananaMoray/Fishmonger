@@ -38,7 +38,7 @@ __initialize = function()
     -- Resources.sprite_load(path, [img_num], [remove_back], [smoooth], [x_orig], [y_orig], [speed])
     local portrait_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites", "sFishmongerPortrait.png"), 1)
     local portraitsmall_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites", "sFishmongerPortraitSmall.png"))
-    local skills_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites", "sFishmongerSkills.png"))
+    local skills_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites", "sFishmongerSkills.png"), 9, false, false)
     local loadout_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites", "sSelectFishmonger.png"), 4, false, false, 28, 0)
 
     local bullet_path = path.combine(_ENV["!plugins_mod_folder_path"], "Sprites", "IWBTSBullet.png")
@@ -51,7 +51,7 @@ __initialize = function()
     local walk_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerWalk.png"), 10, false, false, 24, 19)
     local climb_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerClimb.png"), 6, false, false, 18, 19, 3)
 
-    local attack1_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerAttack1.png"), 5, false, false, 75, 51,2)
+    local attack1_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerAttack1.png"), 6, false, false, 122, 51,2)
     -- bait bucket --
     local bait_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerBait.png"), 1, false, false, 7, 19)
 
@@ -126,10 +126,10 @@ __initialize = function()
     -- == Section skills == --
 
     -- function setup_skill(skill_ref, name, description, 
-    -- sprite, sprite_subimage,animation, 
+    -- sprite, sprite_subimage, animation, 
     -- cooldown, damage, is_primary, skill_id)
     Survivor.setup_skill(Fish.skill_family_z[0], "Fishing Rod", "Whip opponents and keep them at a distance.", 
-        skills_sprite, 1, attack1_sprite,
+        skills_sprite, 0, attack1_sprite,
         1.0, 100.0, true, 160)
 
     Fish.skill_family_z[0].does_change_activity_state = false
@@ -137,14 +137,14 @@ __initialize = function()
     Fish.skill_family_z[0].require_key_press = false
 
     Survivor.setup_skill(Fish.skill_family_x[0], "Fishing Rod Double Deluxe ++", "Turns enemies into <y>burgers</c>. That's lowkey <y>fucked up</c> ngl.", 
-        skills_sprite, 1, idle_sprite,
+        skills_sprite, 4, idle_sprite,
         0.0, 10.0, false, 160)
     Fish.skill_family_x[0].does_change_activity_state = false
     Fish.skill_family_x[0].override_strafe_direction = false
     Fish.skill_family_x[0].require_key_press = true
 
     Survivor.setup_skill(Fish.skill_family_c[0], "Bait Bucket", "Lmao dumbass explode now.",
-        skills_sprite, 1, idle_sprite,
+        skills_sprite, 3, idle_sprite,
         33.0, 10.0, false, 122)
     
     Fish.skill_family_c[0].does_change_activity_state = false
@@ -164,7 +164,7 @@ __initialize = function()
         if args[1].value == Fish.skill_family_z[0].on_activate then
             self.sprite_index = attack1_sprite
             gm.sound_play_at(gm.constants.wMercenaryShoot1_3, 1, 1, self.x, self.y, 500)
-            local attack_offset = 50
+            local attack_offset = 64
             if gm.actor_get_facing_direction(self) == 180 then 
                 attack_offset = -attack_offset
             end
