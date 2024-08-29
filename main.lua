@@ -52,6 +52,8 @@ __initialize = function()
     local climb_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerClimb.png"), 6, false, false, 18, 19, 3)
 
     local attack1_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerAttack1.png"), 6, false, false, 122, 51,2)
+    local special1_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerSpecial1.png"), 7, false, false, 38, 51,2)
+    local special2_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerSpecial2.png"), 7, false, false, 38, 51,2)
     -- bait bucket --
     local bait_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerBait.png"), 1, false, false, 7, 19)
 
@@ -144,7 +146,7 @@ __initialize = function()
     Fish.skill_family_x[0].require_key_press = true
 
     Survivor.setup_skill(Fish.skill_family_c[0], "Bait Bucket", "Lmao dumbass explode now.",
-        skills_sprite, 3, idle_sprite,
+        skills_sprite, 3, special2_sprite,
         33.0, 10.0, false, 122)
     
     Fish.skill_family_c[0].does_change_activity_state = false
@@ -162,7 +164,7 @@ __initialize = function()
     gm.pre_script_hook(gm.constants.callback_execute, function(self, other, result, args)
         if self.class ~= Fish_id then return end
         if args[1].value == Fish.skill_family_z[0].on_activate then
-            self.sprite_index = attack1_sprite
+            self.sprite_index = special2_sprite
             gm.sound_play_at(gm.constants.wMercenaryShoot1_3, 1, 1, self.x, self.y, 500)
             local attack_offset = 64
             if gm.actor_get_facing_direction(self) == 180 then 
