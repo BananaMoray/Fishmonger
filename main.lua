@@ -51,9 +51,9 @@ __initialize = function()
     local walk_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerWalk.png"), 10, false, false, 24, 19)
     local climb_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerClimb.png"), 6, false, false, 18, 19, 3)
 
-    local attack1_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerAttack1.png"), 6, false, false, 122, 51,2)
-    local special1_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerSpecial1.png"), 7, false, false, 38, 51,2)
-    local special2_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerSpecial2.png"), 7, false, false, 38, 51,2)
+    local attack1_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerAttack1.png"), 6, false, false, 122, 51)
+    local special1_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerSpecial1.png"), 7, false, false, 38, 19)
+    local special2_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerSpecial2.png"), 7, false, false, 38, 19)
     -- bait bucket --
     local bait_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerBait.png"), 1, false, false, 7, 19)
 
@@ -82,6 +82,8 @@ __initialize = function()
     gm.sprite_set_speed(idle_sprite, 0.65, 1) -- idle animation speed
     gm.sprite_set_speed(walk_sprite, 0.7, 1) -- walk animation speed
     gm.sprite_set_speed(attack1_sprite, 1, 1)
+    gm.sprite_set_speed(special1_sprite, 1, 1)
+    gm.sprite_set_speed(special2_sprite, 1, 1)
     gm.sprite_set_speed(loadout_sprite, -5, 0) -- loadout Speed
     gm.sprite_set_speed(death_sprite, 1, 1) 
 
@@ -132,7 +134,7 @@ __initialize = function()
     -- cooldown, damage, is_primary, skill_id)
     Survivor.setup_skill(Fish.skill_family_z[0], "Fishing Rod", "Whip opponents and keep them at a distance.", 
         skills_sprite, 0, attack1_sprite,
-        1.0, 100.0, true, 160)
+        15.0, 1.0, false, 160)
 
     Fish.skill_family_z[0].does_change_activity_state = false
     Fish.skill_family_z[0].override_strafe_direction = false
@@ -141,20 +143,29 @@ __initialize = function()
     Survivor.setup_skill(Fish.skill_family_x[0], "Fishing Rod Double Deluxe ++", "Turns enemies into <y>burgers</c>. That's lowkey <y>fucked up</c> ngl.", 
         skills_sprite, 4, idle_sprite,
         0.0, 10.0, false, 160)
+
     Fish.skill_family_x[0].does_change_activity_state = false
     Fish.skill_family_x[0].override_strafe_direction = false
     Fish.skill_family_x[0].require_key_press = true
 
     Survivor.setup_skill(Fish.skill_family_c[0], "Bait Bucket", "Lmao dumbass explode now.",
         skills_sprite, 3, special2_sprite,
-        33.0, 10.0, false, 122)
+        5.0*60, 10.0, false, 122)
     
     Fish.skill_family_c[0].does_change_activity_state = false
     Fish.skill_family_c[0].override_strafe_direction = false
     Fish.skill_family_c[0].require_key_press = true
 
+    Survivor.setup_skill(Fish.skill_family_v[0], "Bait Bucket", "Lmao dumbass explode now.",
+        skills_sprite, 3, special2_sprite,
+        5.0*60, 10.0, false, 122)
+
+    Fish.skill_family_v[0].does_change_activity_state = false
+    Fish.skill_family_v[0].override_strafe_direction = false
+    Fish.skill_family_v[0].require_key_press = true
+
     Survivor.setup_empty_skill(Fish.skill_family_x[0])
-    Survivor.setup_empty_skill(Fish.skill_family_v[0])
+    Survivor.setup_empty_skill(Fish.skill_family_c[0])
 
     -- == Section callbacks == --
 
@@ -164,7 +175,7 @@ __initialize = function()
     gm.pre_script_hook(gm.constants.callback_execute, function(self, other, result, args)
         if self.class ~= Fish_id then return end
         if args[1].value == Fish.skill_family_z[0].on_activate then
-            self.sprite_index = special2_sprite
+            self.sprite_index = attack1_sprite
             gm.sound_play_at(gm.constants.wMercenaryShoot1_3, 1, 1, self.x, self.y, 500)
             local attack_offset = 64
             if gm.actor_get_facing_direction(self) == 180 then 
@@ -174,6 +185,7 @@ __initialize = function()
             custom_sprite = custom_sprite +1
         end
     end)
+
 
     local function setBucket(inst)
         if inst.parent.class ~= Fish_id then return end
