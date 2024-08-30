@@ -1,0 +1,21 @@
+Gameplay:
+- lots of things, this comes later
+
+Assets:
+- Secondary
+- Utility
+- Death animation
+
+Skills:
+- Ability to set alt skills needed
+
+- Special 1: Fish Throw
+    - likely base it on drifter utility 1
+    - make it possible to randomise fish and their values
+- Special 2: Bait Bucket (currently special 1)
+    - fix frame issues
+
+Bugs:
+- Skill frames get cut short by 1
+- Primary Hitbox should be created at frame 4
+- Loud Explosion sfx on primary needs to get removed
