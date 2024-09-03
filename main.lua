@@ -61,20 +61,6 @@ __initialize = function()
 
     local death_sprite = gm.sprite_duplicate(gm.constants.sGolemDeath)
 
-    -- Body Parts 
-
-    local PartsHead_path = path.combine(_ENV["!plugins_mod_folder_path"], "Sprites", "IWBTSPartsHead.png")
-    local PartsHead_sprite = gm.sprite_add(PartsHead_path, 1, true, false, 0, 0)
-
-    local PartsArm_path = path.combine(_ENV["!plugins_mod_folder_path"], "Sprites", "IWBTSPartsArm.png")
-    local PartsArm_sprite = gm.sprite_add(PartsArm_path, 1, true, false, 0, 0)
-
-    local PartsLeg_path = path.combine(_ENV["!plugins_mod_folder_path"], "Sprites", "IWBTSPartsLeg.png")
-    local PartsLeg_sprite = gm.sprite_add(PartsLeg_path, 1, true, false, 0, 0)
-
-    local PartsBody_path = path.combine(_ENV["!plugins_mod_folder_path"], "Sprites", "IWBTSPartsBody.png")
-    local PartsBody_sprite = gm.sprite_add(PartsBody_path, 32, true, false, 0, 0)
-
     -- Sprite Offsets
     gm.sprite_set_offset(death_sprite, 100000, 100000)
 
@@ -103,7 +89,6 @@ __initialize = function()
 
     local bullet_speed = 10.0
     local jump_force = 8.0
-    local body_parts = 15
 
     local normal_hp = 1
     local normal_elite_hp = 3
