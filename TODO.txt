@@ -5,6 +5,7 @@ Assets:
 - Secondary
 - Utility
 - Death animation
+- Log sprites and flavour text
 
 - Special 1: Fish Throw
     - likely base it on drifter utility 1
