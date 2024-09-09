@@ -13,7 +13,7 @@ Assets:
     - fix frame issues
 
 Bugs:
-- Primary Hitbox should be created at frame 4 -- Will set that up once tollkit rewrite is up and running
+- Primary Hitbox should be created at frame 4 -- Will set that up once toolkit rewrite is up and running
 
 Done:
 - Loud Explosion sfx on primary needs to get removed -- Won't happen with next tolkit version
