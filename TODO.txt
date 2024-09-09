@@ -6,9 +6,6 @@ Assets:
 - Utility
 - Death animation
 
-Skills:
-- Ability to set alt skills needed
-
 - Special 1: Fish Throw
     - likely base it on drifter utility 1
     - make it possible to randomise fish and their values
@@ -16,6 +13,9 @@ Skills:
     - fix frame issues
 
 Bugs:
-- Skill frames get cut short by 1
-- Primary Hitbox should be created at frame 4
-- Loud Explosion sfx on primary needs to get removed
+- Primary Hitbox should be created at frame 4 -- Will set that up once tollkit rewrite is up and running
+
+Done:
+- Loud Explosion sfx on primary needs to get removed -- Won't happen with next tolkit version
+- Skill frames get cut short by 1 -- Should not happen with new toolkit version
+- Ability to set alt skills needed -- Done
