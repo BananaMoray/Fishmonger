@@ -50,6 +50,8 @@ __initialize = function()
     local jumpfall_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerFall.png"), 1, false, false, 24, 19)
     local walk_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerWalk.png"), 10, false, false, 24, 19)
     local climb_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerClimb.png"), 6, false, false, 18, 19, 3)
+    local death_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerDeath.png"), 8, false, false, 48, 19)
+    
 
     local attack1_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerAttack1.png"), 6, false, false, 122, 51)
     local special1_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerSpecial1.png"), 7, false, false, 38, 19)
@@ -59,10 +61,7 @@ __initialize = function()
 
     local bullet_sprite = gm.sprite_add(bullet_path, 1, false, false, 100000, 100000)
 
-    local death_sprite = gm.sprite_duplicate(gm.constants.sGolemDeath)
-
     -- Sprite Offsets
-    gm.sprite_set_offset(death_sprite, 100000, 100000)
 
     -- Sprite Speeds
     gm.sprite_set_speed(idle_sprite, 0.65, 1) -- idle animation speed
