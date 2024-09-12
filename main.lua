@@ -45,21 +45,20 @@ __initialize = function()
 
     -- In Game Sprites
     
-    local idle_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites", "sFishmongerIdle.png"), 10, false, false, 24, 19)
-    local jump_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerJump.png"), 2, false, false, 24, 19)
-    local jumpfall_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerFall.png"), 1, false, false, 24, 19)
-    local walk_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerWalk.png"), 10, false, false, 24, 19)
+    local idle_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites", "sFishmongerIdle.png"), 10, false, false, 26, 19)
+    local jump_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerJump.png"), 2, false, false, 26, 19)
+    local jumpfall_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerFall.png"), 1, false, false, 26, 19)
+    local walk_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerWalk.png"), 10, false, false, 23, 19)
     local climb_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerClimb.png"), 6, false, false, 18, 19, 3)
-    local death_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerDeath.png"), 8, false, false, 48, 19)
+    local death_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerDeath.png"), 8, false, false, 45, 19)
     
 
-    local attack1_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerAttack1.png"), 6, false, false, 122, 51)
-    local special1_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerSpecial1.png"), 7, false, false, 38, 19)
-    local special2_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerSpecial2.png"), 7, false, false, 38, 19)
+    local attack1_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerAttack1.png"), 14, false, false, 44, 35)
+    local secondary1_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerSecondary1.png"), 9, false, false, 23, 19)
+    local special1_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerSpecial1.png"), 7, false, false, 12, 19)
+    local special2_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerSpecial2.png"), 7, false, false, 12, 19)
     -- bait bucket --
     local bait_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerBait.png"), 1, false, false, 7, 19)
-
-    local bullet_sprite = gm.sprite_add(bullet_path, 1, false, false, 100000, 100000)
 
     -- Sprite Offsets
 
@@ -67,6 +66,7 @@ __initialize = function()
     gm.sprite_set_speed(idle_sprite, 0.65, 1) -- idle animation speed
     gm.sprite_set_speed(walk_sprite, 0.7, 1) -- walk animation speed
     gm.sprite_set_speed(attack1_sprite, 1, 1)
+    gm.sprite_set_speed(secondary1_sprite, 1, 1)
     gm.sprite_set_speed(special1_sprite, 1, 1)
     gm.sprite_set_speed(special2_sprite, 1, 1)
     gm.sprite_set_speed(loadout_sprite, -5, 0) -- loadout Speed
