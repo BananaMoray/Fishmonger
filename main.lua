@@ -47,6 +47,7 @@ __initialize = function()
     
     local idle_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites", "sFishmongerIdle.png"), 10, false, false, 26, 19)
     local jump_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerJump.png"), 2, false, false, 26, 19)
+    local jump_peak_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerJumpPeak.png"), 2, false, false, 26, 19)
     local jumpfall_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerFall.png"), 1, false, false, 26, 19)
     local walk_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerWalk.png"), 10, false, false, 23, 19)
     local climb_sprite = Resources.sprite_load(path.combine(_ENV["!plugins_mod_folder_path"], "Sprites","sFishmongerClimb.png"), 6, false, false, 18, 19, 3)
@@ -102,7 +103,7 @@ __initialize = function()
     Fish, Fish_id = Survivor.setup_survivor(
         "FishedMongered", "fish", "Fishmonger", "The <y>Fishmonger</c> is here?!", "...",
         loadout_sprite, portrait_sprite, portraitsmall_sprite, loadout_sprite,
-        walk_sprite, idle_sprite, death_sprite, jump_sprite, jumpfall_sprite, jumpfall_sprite, climb_sprite,
+        walk_sprite, idle_sprite, death_sprite, jump_sprite, jump_peak_sprite, jumpfall_sprite, climb_sprite,
         {["r"]=238, ["g"] = 173, ["b"] = 105}, {[1] = 0.0, [2] = -9.0, [3] = 3.0}
     )
     -- function setup_stats(survivor_id, armor, attack_speed, movement_speed, critical_chance, damage, hp_regen, maxhp, maxbarrier, maxshield, maxhp_cap, jump_force)
