@@ -1,17 +1,21 @@
 Gameplay:
 - lots of things, this comes later
+- balancing
 
 Assets:
-- Secondary
-- Utility
-- Death animation
-- Log sprites and flavour text
+- Secondary -- Done
+- Utility -- Done
+- Death animation -- Done
+- Logbook and flavour text -- Done
+- Select Screen revamp and Animation
+- 
 
 - Special 1: Fish Throw
-    - likely base it on drifter utility 1
-    - make it possible to randomise fish and their values
-- Special 2: Bait Bucket (currently special 1)
-    - fix frame issues
+    - Add more fish
+    - Scepter fish
+- Special 2: Bait Bucket
+    - bait bucket revamp
+    - scepter variant shark attack
 
 Bugs:
 - Primary Hitbox should be created at frame 4 -- Will set that up once toolkit rewrite is up and running
