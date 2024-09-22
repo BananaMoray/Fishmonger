@@ -37,7 +37,7 @@ __initialize = function()
     -- Menu Sprites
 
     -- Resources.sprite_load(namespace, identifier, path, [img_num], [x_orig], [y_orig])
-    local sFishmongerPortrait = Resources.sprite_load(NAMESPACE, "sFishmongerPortrait", path.combine(PATH, "Sprites", "sFishmongerPortrait.png"), 1)
+    local sFishmongerPortrait = Resources.sprite_load(NAMESPACE, "sFishmongerPortrait", path.combine(PATH, "Sprites", "sFishmongerPortrait.png"), 3)
     local sFishmongerPortraitSmall = Resources.sprite_load(NAMESPACE, "sFishmongerPortraitSmall", path.combine(PATH, "Sprites", "sFishmongerPortraitSmall.png"))
     local sFishmongerSkills = Resources.sprite_load(NAMESPACE, "sFishmongerSkills", path.combine(PATH, "Sprites", "sFishmongerSkills.png"), 9)
     local sSelectFishmonger = Resources.sprite_load(NAMESPACE, "sSelectFishmonger", path.combine(PATH, "Sprites", "sSelectFishmonger.png"), 4, 28, 0)
@@ -49,6 +49,7 @@ __initialize = function()
         idle = Resources.sprite_load(NAMESPACE, "sFishmongerIdle", path.combine(PATH, "Sprites", "sFishmongerIdle.png"), 10, 26, 19),
         walk = Resources.sprite_load(NAMESPACE, "sFishmongerWalk", path.combine(PATH, "Sprites", "sFishmongerWalk.png"), 10, 23, 19),
         jump = Resources.sprite_load(NAMESPACE, "sFishmongerJump", path.combine(PATH, "Sprites", "sFishmongerJump.png"), 2, 26, 19),
+        jump_peak = Resources.sprite_load(NAMESPACE, "sFishmongerJumpPeak", path.combine(PATH, "Sprites", "sFishmongerJumpPeak.png"), 2, 26, 19),
         fall = Resources.sprite_load(NAMESPACE, "sFishmongerFall", path.combine(PATH, "Sprites", "sFishmongerFall.png"), 1, 26, 19),
         climb = Resources.sprite_load(NAMESPACE, "sFishmongerClimb", path.combine(PATH, "Sprites", "sFishmongerClimb.png"), 6, 18, 19, 3),
         death = Resources.sprite_load(NAMESPACE, "sFishmongerDeath", path.combine(PATH, "Sprites", "sFishmongerDeath.png"), 8, 45, 19),
@@ -163,13 +164,13 @@ __initialize = function()
     skill_hook:set_skill_properties(1.0, 15)
 
     local skill_ensnaringNet = fishmonger:get_secondary()
-    skill_ensnaringNet:set_skill_icon(sFishmongerSkills, 2)
+    skill_ensnaringNet:set_skill_icon(sFishmongerSkills, 1)
     skill_ensnaringNet:set_skill_properties(10.0, 0)
     skill_ensnaringNet:set_skill_animation(sprites.idle)
     skill_ensnaringNet.require_key_press = true
 
     local skill_splash = fishmonger:get_utility()
-    skill_splash:set_skill_icon(sFishmongerSkills, 1)
+    skill_splash:set_skill_icon(sFishmongerSkills, 2)
     skill_splash:set_skill_properties(10.0, 1 * 60)
     skill_splash:set_skill_animation(sFishmongerUtility1)
     skill_splash.require_key_press = true
@@ -248,13 +249,15 @@ __initialize = function()
     end
 
     skill_hook:onActivate(function(actor, skill, index)
-        if actor.fishmonger_count == 0 then
-            gm.actor_set_state(actor, state_hookA.value)
-            actor.fishmonger_count = hook_combo_counter
-            Alarm.create(fishmonger_decr_counter, 1, actor)
+        local actorAC = actor.value
+
+        if actorAC.fishmonger_count == 0 then
+            gm.actor_set_state(actorAC, state_hookA.value)
+            actorAC.fishmonger_count = hook_combo_counter
+            Alarm.create(fishmonger_decr_counter, 1, actorAC)
         else
-            actor.fishmonger_count = 0
-            gm.actor_set_state(actor, state_hookB.value)
+            actorAC.fishmonger_count = 0
+            gm.actor_set_state(actorAC, state_hookB.value)
         end
     end)
 
@@ -264,35 +267,37 @@ __initialize = function()
     end)
 
     state_hookA:onStep(function(actor, data)
-        actor:skill_util_fix_hspeed()
-        
-        actor:actor_animation_set(sFishmongerPrimary1_1, 0.25)
+        local actorAC = actor.value
 
-        if data.fired == 0 and actor.image_index >= 3 then
-            local damage = actor:skill_get_damage(skill_hook.value)
+        actorAC:skill_util_fix_hspeed()
+        
+        actorAC:actor_animation_set(sFishmongerPrimary1_1, 0.25)
+
+        if data.fired == 0 and actorAC.image_index >= 3 then
+            local damage = actorAC:skill_get_damage(skill_hook.value)
 
             local attack_offset = hook_attack_offset
-            if actor:skill_util_facing_direction() == 180 then 
+            if actorAC:skill_util_facing_direction() == 180 then 
                 attack_offset = -attack_offset
             end
 
-            if actor:is_authority() then
-                if not actor:skill_util_update_heaven_cracker(actor, damage) then
+            if actorAC:is_authority() then
+                if not actorAC:skill_util_update_heaven_cracker(actorAC, damage) then
                     local buff_shadow_clone = Buff.find("ror", "shadowClone")
-                    for i=0, gm.get_buff_stack(actor, buff_shadow_clone.value) do
-                        local attack = gm._mod_attack_fire_explosion(actor, actor.x + attack_offset, actor.y, hook_width, hook_height, damage, -1, gm.constants.sSparks17_PROV)
+                    for i=0, gm.get_buff_stack(actorAC, buff_shadow_clone.value) do
+                        local attack = gm._mod_attack_fire_explosion(actorAC, actorAC.x + attack_offset, actorAC.y, hook_width, hook_height, damage, -1, gm.constants.sSparks17_PROV)
                         attack.attack_info.stun = true
                         attack.attack_info.climb = i * 8
                     end
                 end
             end
 
-            -- gm.sound_play_at(gm.constants.wMercenaryShoot1_3, 1, 1, actor.x, actor.y, 500)
-            actor:sound_play(gm.constants.wMercenaryShoot1_3, 1, 0.9 + math.random() * 0.2)
+            -- gm.sound_play_at(gm.constants.wMercenaryShoot1_3, 1, 1, actorAC.x, actorAC.y, 500)
+            actorAC:sound_play(gm.constants.wMercenaryShoot1_3, 1, 0.9 + math.random() * 0.2)
             data.fired = 1
         end
 
-        actor:skill_util_exit_state_on_anim_end()
+        actorAC:skill_util_exit_state_on_anim_end()
     end)
     
     state_hookB:onEnter(function(actor, data)
@@ -301,34 +306,36 @@ __initialize = function()
     end)
 
     state_hookB:onStep(function(actor, data)
-        actor:skill_util_fix_hspeed()
+        local actorAC = actor.value
 
-        actor:actor_animation_set(sFishmongerPrimary1_2, 0.25)
+        actorAC:skill_util_fix_hspeed()
 
-        if data.fired == 0 and actor.image_index >= 3 then
-            local damage = actor:skill_get_damage(skill_hook.value)
+        actorAC:actor_animation_set(sFishmongerPrimary1_2, 0.25)
+
+        if data.fired == 0 and actorAC.image_index >= 3 then
+            local damage = actorAC:skill_get_damage(skill_hook.value)
 
             local attack_offset = hook_attack_offset
-            if actor:skill_util_facing_direction() == 180 then 
+            if actorAC:skill_util_facing_direction() == 180 then 
                 attack_offset = -attack_offset
             end
 
-            if actor:is_authority() then
-                if not actor:skill_util_update_heaven_cracker(actor, damage) then
+            if actorAC:is_authority() then
+                if not actorAC:skill_util_update_heaven_cracker(actorAC, damage) then
                     local buff_shadow_clone = Buff.find("ror", "shadowClone")
-                    for i=0, gm.get_buff_stack(actor, buff_shadow_clone.value) do
-                        local attack = gm._mod_attack_fire_explosion(actor, actor.x + attack_offset, actor.y, hook_width, hook_height, damage, -1, gm.constants.sSparks17_PROV)
+                    for i=0, gm.get_buff_stack(actorAC, buff_shadow_clone.value) do
+                        local attack = gm._mod_attack_fire_explosion(actorAC, actorAC.x + attack_offset, actorAC.y, hook_width, hook_height, damage, -1, gm.constants.sSparks17_PROV)
                         attack.attack_info.stun = true
                         attack.attack_info.climb = i * 8
                     end
                 end
             end
 
-            actor:sound_play(gm.constants.wMercenaryShoot1_3, 1, 0.9 + math.random() * 0.2)
+            actorAC:sound_play(gm.constants.wMercenaryShoot1_3, 1, 0.9 + math.random() * 0.2)
             data.fired = 1
         end
 
-        actor:skill_util_exit_state_on_anim_end()
+        actorAC:skill_util_exit_state_on_anim_end()
     end)
 
 
@@ -366,7 +373,7 @@ __initialize = function()
     end)
 
     skill_splash:onActivate(function(actor, skill, index)
-        gm.actor_set_state(actor, state_splash.value)
+        gm.actor_set_state(actor.value, state_splash.value)
     end)
 
     state_splash:onEnter(function(actor, data)
@@ -376,40 +383,53 @@ __initialize = function()
     end)
 
     state_splash:onStep(function(actor, data)
-        actor:skill_util_fix_hspeed()
+        local actorAC = actor.value
 
-        actor:actor_animation_set(actor:actor_get_skill_animation(skill_splash.value), 0.25)
+        actorAC:skill_util_fix_hspeed()
 
-        if data.fired == 0 and actor.image_index >= 0 then
-            local damage = actor:skill_get_damage(skill_splash.value)
+        actorAC:actor_animation_set(actorAC:actor_get_skill_animation(skill_splash.value), 0.25)
+
+        if data.fired == 0 and actorAC.image_index >= 0 then
+            local damage = actorAC:skill_get_damage(skill_splash.value)
 
             local attack_offset = 20
-            if actor:skill_util_facing_direction() == 180 then 
+            if actorAC:skill_util_facing_direction() == 180 then 
                 attack_offset = -attack_offset
             end
             
-            if actor:is_authority() then
+            if actorAC:is_authority() then
                 local buff_shadow_clone = Buff.find("ror", "shadowClone")
-                for i=0, gm.get_buff_stack(actor, buff_shadow_clone.value) do
-                    local attack = gm._mod_attack_fire_explosion(actor, actor.x + attack_offset, actor.y, splash_width, splash_height, damage, -1, gm.constants.sSparks17_PROV)
+                for i=0, gm.get_buff_stack(actorAC, buff_shadow_clone.value) do
+                    local attack = gm._mod_attack_fire_explosion(actorAC, actorAC.x + attack_offset, actorAC.y, splash_width, splash_height, damage, -1, gm.constants.sSparks17_PROV)
                     attack.attack_info.stun = true -- change stun duration?
                     attack.attack_info.climb = i * 8
 
-                    splash_direction = gm.cos(gm.degtorad(actor:skill_util_facing_direction()))
-                    splash:create(actor.x + attack_offset, actor.y)
+                    splash_direction = gm.cos(gm.degtorad(actorAC:skill_util_facing_direction()))
+                    splash:create(actorAC.x + attack_offset, actorAC.y)
                 end
             end
 
-            actor:sound_play(gm.constants.wGeyser, 1, 0.9 + math.random() * 0.2)
+            actorAC:sound_play(gm.constants.wGeyser, 1, 0.9 + math.random() * 0.2)
             data.fired = 1
-        elseif data.slide == 0 and actor.image_index >= 2 then
-            actor.pHspeed = -gm.cos(gm.degtorad(actor:skill_util_facing_direction())) * actor.pHmax * slash_slide_force
+        elseif data.slide == 0 and actorAC.image_index >= 2 then
 
-            actor:sound_play(gm.constants.wCommandoRoll, 1, 0.9 + math.random() * 0.2)
+            actorAC.pHspeed = -gm.cos(gm.degtorad(actorAC:skill_util_facing_direction())) * actorAC.pHmax * slash_slide_force
+
+            actorAC:sound_play(gm.constants.wCommandoRoll, 1, 0.9 + math.random() * 0.2)
             data.slide = 1
         end
 
-        actor:skill_util_exit_state_on_anim_end()
+        if data.slide == 1 and actorAC.image_index >= 8.0 then
+            if actorAC.invincible <= 5 then
+                actorAC.invincible = 0
+            end
+        else
+            if actorAC.invincible < 5 then 
+                actorAC.invincible = 5
+            end
+        end
+
+        actorAC:skill_util_exit_state_on_anim_end()
     end)
 
 
