@@ -56,8 +56,10 @@ initialize = function()
     local sFishmongerBait = Resources.sprite_load(NAMESPACE, "sFishmongerBait", path.combine(PATH, "Sprites", "sFishmongerBait.png"), 1, 7, 19)
     -- Splash
     local sFishmongerGeyser = Resources.sprite_load(NAMESPACE, "sFishmongerGeyser", path.combine(PATH, "Sprites", "sFishmongerGeyser.png"), 9, 32, 50)
+    -- Net
     local sFishmongerNet = Resources.sprite_load(NAMESPACE, "sFishmongerNet", path.combine(PATH, "Sprites", "sFishmongerNet.png"), 7, 48, 19)
-
+    -- Live Bait
+    local sFishmongerLiveBait = Resources.sprite_load(NAMESPACE, "sFishmongerSpecialFish", path.combine(PATH, "Sprites", "sFishmongerSpecialFish.png"), 8, 12, 19)
 
     -- Sprite Offsets
 
@@ -92,7 +94,7 @@ initialize = function()
     local hook_height = 35
 
     -- Secondary 
-    local ensnaring_net_duration = 120
+    local ensnaring_net_duration = 60
     local ensnaring_net_stun_duration = 10
 
     -- Utility
@@ -101,6 +103,14 @@ initialize = function()
     local splash_width = 40
     local splash_height = 25
     local slash_slide_force = 5
+
+    -- Special
+    local live_bait_duration = 120
+    local live_bait_damage_cooldown = 50
+    local live_bait_width = 30
+    local live_bait_height = 30
+    local live_bait_number = 6
+    local live_bait_scale = 0.3
 
     -- Create a new survivor
     local fishmonger = Survivor.new(NAMESPACE, "fishmonger")
@@ -177,7 +187,7 @@ initialize = function()
 
     local skill_live_bait = fishmonger:get_special()
     skill_live_bait:set_skill_icon(sFishmongerSkills, 3)
-    skill_live_bait:set_skill_properties(3.0, 5 * 60)
+    skill_live_bait:set_skill_properties(0.8, 5 * 60)
     skill_live_bait:set_skill_animation(sFishmongerSpecial1)
     skill_live_bait.require_key_press = true
 
@@ -340,6 +350,8 @@ initialize = function()
         Subsection Secondary Skill
     ]]--
 
+    -- Ensnaring net
+
     local ensnaring_net_direction = 1
     local ensnaring_team = 1
     local ensnaring_net = Object.new(NAMESPACE, "fishmongerNet")
@@ -348,11 +360,11 @@ initialize = function()
 
     ensnaring_net:onCreate(function(inst)
         inst.image_index = 0
-        inst.y = inst.y + 0.3
         inst.image_xscale = ensnaring_net_direction
         inst.floored = 0
-        inst.m_collisionTestNumber = 3212836864
-        inst.gravity = 0.2
+        inst.gravity = 0.1
+        inst.hspeed = 1.5 * ensnaring_net_direction
+        inst.vspeed = -0.5
         inst.gravity_direction = 270
 
         local selfData = inst:get_data()
@@ -374,6 +386,7 @@ initialize = function()
         if selfData.stopped > 0 then
             inst.image_index = 4.0
             inst.vspeed = 0
+            inst.hspeed = 0
             selfData.stopped = selfData.stopped + 1
             if selfData.stopped > ensnaring_net_duration then
                 inst:destroy()
@@ -381,12 +394,16 @@ initialize = function()
         elseif inst:is_colliding(gm.constants.pSolidBulletCollision) then
             inst.gravity = 0
             inst.vspeed = 0
+            inst.hspeed = 0
             selfData.stopped = 1
         elseif inst.image_index > 5.0 then
             inst.image_index = 4.0
+            inst.hspeed = 1.5*inst.image_xscale
         end
 
     end)
+
+    -- Skill
 
     skill_ensnaring_net:onActivate(function(actor, skill, index)
         GM.actor_set_state(actor, state_ensnaring_net)
@@ -405,7 +422,7 @@ initialize = function()
         if data.fired == 0 and actor.image_index >= 8 then
             local damage = actor:skill_get_damage(skill_ensnaring_net.value)
 
-            local attack_offset = 20
+            local attack_offset = 60
             if actor:skill_util_facing_direction() == 180 then 
                 attack_offset = -attack_offset
             end
@@ -415,7 +432,7 @@ initialize = function()
                 for i=0, GM.get_buff_stack(actor, buff_shadow_clone) do
                     ensnaring_net_direction = gm.cos(gm.degtorad(actor:skill_util_facing_direction()))
                     ensnaring_team = actor.team
-                    ensnaring_net:create(actor.x + attack_offset, actor.y)
+                    ensnaring_net:create(actor.x + attack_offset, actor.y - 3)
                 end
             end
 
@@ -425,7 +442,6 @@ initialize = function()
 
         actor:skill_util_exit_state_on_anim_end()
     end)
-
 
 
     --[[
@@ -518,6 +534,105 @@ initialize = function()
 
         actor:skill_util_exit_state_on_anim_end()
     end)
+
+    --[[
+        Subsection Special Skill 
+    ]]--
+
+    -- Fishies
+    local live_bait_direction = 1
+    local live_bait = Object.new(NAMESPACE, "fishmongerLiveBait")
+    live_bait:set_sprite(sFishmongerLiveBait)
+    ensnaring_net:set_depth(1)
+
+    live_bait:onCreate(function(inst)
+        local selfData = inst:get_data()
+        selfData.nb = math.random(0, 3) * 2
+        selfData.duration = 200
+        selfData.lastDamaged = 0
+
+        inst.image_index = selfData.nb
+
+        inst.image_xscale = live_bait_direction*live_bait_scale
+        inst.vspeed = -0.1
+        inst.gravity = 0.15
+        inst.image_speed = 0
+        inst.hspeed = (math.random()*0.5 + 0.3) * live_bait_direction
+    end)
+
+    live_bait:onStep(function(inst)
+        local selfData = inst:get_data()
+
+        inst.image_angle = inst.image_angle + 3
+
+        if inst:is_colliding(gm.constants.pSolidBulletCollision) then
+            inst.vspeed = -2
+        end
+
+        if selfData.lastDamaged < 0 then
+            local actors = inst:get_collisions(gm.constants.pActor)
+            for _, actor in ipairs(actors) do
+                if (actor.team and actor.team ~= selfData.team)
+                or (actor.parent and actor.parent.team and actor.parent.team ~= selfData.team) then
+                    GM._mod_attack_fire_explosion(selfData.parent, inst.x, inst.y, live_bait_width, live_bait_height, skill_live_bait.damage, -1, gm.constants.sSparks17_PROV)
+                    selfData.lastDamaged = live_bait_damage_cooldown
+                end
+            end
+        else 
+            selfData.lastDamaged = selfData.lastDamaged -1
+        end        
+
+        selfData.duration = selfData.duration - 1
+        if selfData.duration < 0 then 
+            inst:destroy()
+        end
+    end)
+
+    -- Skill
+
+    skill_live_bait:onActivate(function(actor, skill, index)
+        GM.actor_set_state(actor, state_live_bait)
+    end)
+
+    state_live_bait:onEnter(function(actor, data)
+        actor.image_index = 0
+        data.fired = 0
+    end)
+
+    state_live_bait:onStep(function(actor, data)
+        actor:skill_util_fix_hspeed()
+
+        actor:actor_animation_set(sFishmongerSpecial1, 0.25)
+
+        if data.fired == 0 and actor.image_index >=4 then
+            local damage = actor:skill_get_damage(skill_ensnaring_net.value)
+
+            local attack_offset = 20
+            if actor:skill_util_facing_direction() == 180 then 
+                attack_offset = -attack_offset
+            end
+            
+            if actor:is_authority() then
+                local buff_shadow_clone = Buff.find("ror", "shadowClone")
+                for i=0, GM.get_buff_stack(actor, buff_shadow_clone) do
+                    for i=0, live_bait_number-1 do
+                        local inst = live_bait:create(actor.x + attack_offset, actor.y)
+                        local instData = inst:get_data()
+                        instData.parent = actor
+                        instData.team = actor.team
+                        instData.direction = gm.cos(gm.degtorad(actor:skill_util_facing_direction()))
+                        live_bait_direction = gm.cos(gm.degtorad(actor:skill_util_facing_direction()))
+                    end
+                end
+            end
+
+            actor:sound_play(gm.constants.wGeyser, 1, 0.9 + math.random() * 0.2)
+            data.fired = 1
+        end
+
+        actor:skill_util_exit_state_on_anim_end()
+    end)
+
 
 
     --[[
