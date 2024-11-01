@@ -62,7 +62,7 @@ initialize = function()
     -- Live Bait
     local sFishmongerLiveBait = Resources.sprite_load(NAMESPACE, "sFishmongerSpecialFish", path.combine(PATH, "Sprites", "sFishmongerSpecialFish.png"), 8, 12, 19)
     -- Live Bait Boosted
-    local sFishmongerLiveBaitBoosted = Resources.sprite_load(NAMESPACE, "sFishmongerSpecialFishBoosted", path.combine(PATH, "Sprites", "sFishmongerSpecialFishBoosted.png"), 4, 24, 24)
+    local sFishmongerLiveBaitBoosted = Resources.sprite_load(NAMESPACE, "sFishmongerSpecialFishBoosted", path.combine(PATH, "Sprites", "sFishmongerSpecialFishBoosted.png"), 4, 24, 24)   
 
     -- Sprite Offsets
 
@@ -119,6 +119,14 @@ initialize = function()
     local live_bait_boosted_height = 40
     local live_bait_boosted_width = 40
     local live_bait_boosted_duration = 240
+
+    -- Alt Special
+    local still_fishing_height = 60
+    local still_fishing_width = 120
+
+    -- Alt Special Boosted
+    local still_fishing_boosted_height = 80
+    local still_fishing_boosted_width = 120
 
     -- Create a new survivor
     local fishmonger = Survivor.new(NAMESPACE, "fishmonger")
@@ -546,7 +554,7 @@ initialize = function()
     end)
 
     --[[
-        Subsection Special Skill 
+        Subsection Special1 Skill 
     ]]--
 
     -- Fishies
@@ -650,19 +658,8 @@ initialize = function()
     end)
 
 
-
     --[[
-        Subsection Special Upgraded Skill 
-    ]]--
-
-
-    -- Setup the Special1 Boosted skill
-
-
-    -- Setup the Special2 skill
-
-    --[[
-        Subsection Special2 Boosted skill
+        Subsection Special1 Boosted Skill
     ]]--
 
     
@@ -697,26 +694,12 @@ initialize = function()
         if inst.image_index >= 2.0 and inst.image_index < 2.2 then
             local attack = GM._mod_attack_fire_explosion(selfData.parent, inst.x, inst.y, live_bait_boosted_width, live_bait_boosted_height, skill_live_bait_boosted.damage, -1, gm.constants.sSparks17_PROV)
             attack.shark_bleed = true
+            attack.execute = true
         end
 
         if inst:is_colliding(gm.constants.pSolidBulletCollision) then
             inst.vspeed = -2.5
         end
-
-        -- if selfData.lastDamaged < 0 then
-        --     local actors = inst:get_collisions(gm.constants.pActor)
-        --     for _, actor in ipairs(actors) do
-        --         if (actor.team and actor.team ~= selfData.team)
-        --         or (actor.parent and actor.parent.team and actor.parent.team ~= selfData.team) then
-        --             GM._mod_attack_fire_explosion(selfData.parent, inst.x, inst.y, live_bait_boosted_width, live_bait_boosted_height, skill_live_bait_boosted.damage, -1, gm.constants.sSparks17_PROV)
-        --             selfData.lastDamaged = live_bait_boosted_damage_cooldown
-        --         end
-        --     end
-        -- else 
-        --     selfData.lastDamaged = selfData.lastDamaged -1
-        -- end
-
-        
 
         selfData.duration = selfData.duration - 1
         if selfData.duration < 0 then 
@@ -741,7 +724,6 @@ initialize = function()
         actor:actor_animation_set(sFishmongerSpecial1Boosted, 0.25)
 
         if data.fired == 0 and actor.image_index >=4 then
-            local damage = actor:skill_get_damage(skill_ensnaring_net.value)
 
             local attack_offset = 20
             if actor:skill_util_facing_direction() == 180 then 
@@ -770,7 +752,7 @@ initialize = function()
     fishmonger:add_instance_callback(function(obj_inst, hit_inst, hit_x, hit_y)
         if not obj_inst.shark_bleed or hit_inst.dead == nil then return end
 
-        if hit_inst.hp*5 < hit_inst.maxhp then --kill enemies under 20% hp
+        if hit_inst.hp*5 < hit_inst.maxhp and obj_inst.execute then --kill enemies under 20% hp
             hit_inst:kill()
         end
     
@@ -784,8 +766,94 @@ initialize = function()
         dot.sprite_index = gm.constants.sSparks9
     end)
 
+    --[[
+        Subsection Special2 Skill 
+    ]]--
     
+    local still_fishing_bait = Object.wrap(gm.constants.oArtiSnap)
+
+    local set_still_fishing = function(inst)
+        inst.sprite_index = sFishmongerBait
+        inst.is_custom_bait = true
+        -- inst.hp = the hp you want
+    end
+
+    local  still_fishing_damage = Object.new(NAMESPACE, "fishmongerStillFishing")
+    still_fishing_damage:set_sprite(sFishmongerLiveBaitBoosted) -- change this sprite
+    still_fishing_damage:set_depth(1)
+
+    still_fishing_damage:onCreate(function(inst)
+        inst.image_speed = 0.25
+    end)
+
+    still_fishing_damage:onStep(function(inst)
+        local selfData = inst:get_data()
+        if inst.image_index < 0.2 then
+            local attack = GM._mod_attack_fire_explosion(selfData.parent, inst.x, inst.y, still_fishing_width, still_fishing_height, skill_still_fishing.damage, -1, gm.constants.sSparks17_PROV)
+            attack.shark_bleed = true
+        elseif inst.image_index > 3 then
+            inst:destroy()
+        end
+    end)
+
+
+    gm.pre_code_execute("gml_Object_oArtiSnap_Destroy_0", function(self, other)
+        self:instance_destroy_sync()
+
+        if self.is_custom_bait then
+            local inst = still_fishing_damage:create(self.x, self.y)
+            local instData = inst:get_data()
+            instData.parent = self.parent
+            return false
+        end
+        
+    end)
+
+    -- skill
+
+    skill_still_fishing:onActivate(function(actor, skill, index)
+        GM.actor_set_state(actor, state_still_fishing)
+    end)
+
+    state_still_fishing:onEnter(function(actor, data)
+        actor.image_index = 0
+        data.fired = 0
+    end)
+
+    state_still_fishing:onStep(function(actor, data)
+        actor:skill_util_fix_hspeed()
+
+        actor:actor_animation_set(sFishmongerSpecial1, 0.25) -- change to Special2
+
+        if data.fired == 0 and actor.image_index >=4 then
+            local attack_offset = 20
+            if actor:skill_util_facing_direction() == 180 then 
+                attack_offset = -attack_offset
+            end
+            
+            if actor:is_authority() then
+                local buff_shadow_clone = Buff.find("ror", "shadowClone")
+                for i=0, GM.get_buff_stack(actor, buff_shadow_clone) do
+                    -- create an oArtiSnap and repurpose it
+                    local inst = still_fishing_bait:create(actor.x, actor.y)
+                    inst.parent = actor.value
+                    inst.sprite_index = sFishmongerBait
+                    -- inst.hp = the hp you want
+                    Alarm.create(set_still_fishing, 1, inst, actor.value)
+                    Alarm.create(set_still_fishing, 2, inst, actor.value)
+                end
+            end
+
+            actor:sound_play(gm.constants.wGeyser, 1, 0.9 + math.random() * 0.2)
+            data.fired = 1
+        end
+
+        actor:skill_util_exit_state_on_anim_end()
+    end)
+
 
 end
+
+Initialize(initialize)
 
 Initialize(initialize)
