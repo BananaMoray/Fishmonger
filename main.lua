@@ -83,6 +83,9 @@ initialize = function()
     local sound_splash = Resources.sfx_load(NAMESPACE, "FishmongerSplash", path.combine(PATH, "Sounds", "splash-fx.ogg"))
     local sound_throw = Resources.sfx_load(NAMESPACE, "FishmongerThrow", path.combine(PATH, "Sounds", "Throw Sound Effect - Free.ogg"))
     local sound_fishing_net = Resources.sfx_load(NAMESPACE, "FishmongerFishingNet", path.combine(PATH, "Sounds", "Fishing net.ogg"))
+    local sound_whip = Resources.sfx_load(NAMESPACE, "FishmongerWhip", path.combine(PATH, "Sounds", "whip2.ogg"))
+    local sound_fish_throw = Resources.sfx_load(NAMESPACE, "FishmongerFishThrow", path.combine(PATH, "Sounds", "FishThrow.ogg"))
+    local sound_fish_jump = Resources.sfx_load(NAMESPACE, "FishmongerFishJump", path.combine(PATH, "Sounds", "FishJump.ogg"))
     
     -- == Section Setup + Stats == --
 
@@ -317,7 +320,7 @@ initialize = function()
                 
             end
 
-            actor:sound_play(gm.constants.wMercenaryShoot1_3, 1, 0.9 + math.random() * 0.2)
+            actor:sound_play(sound_whip, 2, 0.6 + math.random() * 0.4)
             data.fired = 1
         end
 
@@ -352,7 +355,7 @@ initialize = function()
                 end
             end
 
-            actor:sound_play(gm.constants.wMercenaryShoot1_3, 1, 0.9 + math.random() * 0.2)
+            actor:sound_play(sound_whip, 2, 0.6 + math.random() * 0.4)
             data.fired = 1
         end
 
@@ -596,9 +599,11 @@ initialize = function()
 		if bounce_h then
 			inst.hspeed = inst.hspeed * -1.0
             inst.image_xscale = - inst.image_xscale
+            inst:sound_play(sound_fish_jump, 1, 0.9 + math.random() * 0.2)
 		end
 		if bounce_v then
 			inst.vspeed = -3
+            inst:sound_play(sound_fish_jump, 1, 0.9 + math.random() * 0.2)
 		end
 
         -- damage collisions
@@ -637,7 +642,14 @@ initialize = function()
 
         actor:actor_animation_set(sFishmongerSpecial1, 0.25)
 
-        if data.fired == 0 and actor.image_index >=4 then
+
+        
+        if data.fired == 0 and actor.image_index >=2 then
+            actor:sound_play(sound_fish_throw, 1, 0.9 + math.random() * 0.2)
+            data.fired = 1
+        end
+
+        if data.fired < 2 and actor.image_index >=4 then
             local damage = actor:skill_get_damage(skill_live_bait.value)
 
             local attack_offset = 20
@@ -649,16 +661,16 @@ initialize = function()
                 local buff_shadow_clone = Buff.find("ror", "shadowClone")
                 for i=0, GM.get_buff_stack(actor, buff_shadow_clone) do
                     for i=0, live_bait_number-1 do
-                        local fishie = live_bait:create(actor.x + attack_offset, actor.y )
+                        local fishie = live_bait:create(actor.x + attack_offset, actor.y - math.random()*40.0 )
                         fishie.direction = actor:skill_util_facing_direction()
                         fishie.parent = actor
                         fishie.team = actor.team
                         if fishie.direction == 180.0 then
                             fishie.image_xscale = - live_bait_scale
-                            fishie.hspeed = -(math.random()*0.5 + 0.3)
+                            fishie.hspeed = -(math.random() + 0.3)
                         else
                             fishie.image_xscale = live_bait_scale
-                            fishie.hspeed = (math.random()*0.5 + 0.3)
+                            fishie.hspeed = (math.random() + 0.3)
                         end
                         
                         fishie.image_yscale = live_bait_scale
@@ -670,8 +682,8 @@ initialize = function()
                 end
             --end
 
-            actor:sound_play(gm.constants.wGeyser, 1, 0.9 + math.random() * 0.2)
-            data.fired = 1
+            
+            data.fired = 2
         end
 
         actor:skill_util_exit_state_on_anim_end()
@@ -762,7 +774,12 @@ initialize = function()
 
         actor:actor_animation_set(sFishmongerSpecial1Boosted, 0.25)
 
-        if data.fired == 0 and actor.image_index >=4 then
+        if data.fired == 0 and actor.image_index >=2 then
+            actor:sound_play(sound_fish_throw, 1, 0.9 + math.random() * 0.2)
+            data.fired = 1
+        end
+
+        if data.fired < 2 and actor.image_index >=4 then
 
             local attack_offset = 20
             if actor:skill_util_facing_direction() == 180 then 
@@ -790,9 +807,7 @@ initialize = function()
                     instData.team = actor.team
                 end
             --end
-
-            actor:sound_play(gm.constants.wGeyser, 1, 0.9 + math.random() * 0.2)
-            data.fired = 1
+            data.fired = 2
         end
 
         actor:skill_util_exit_state_on_anim_end()
