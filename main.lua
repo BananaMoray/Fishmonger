@@ -308,7 +308,8 @@ initialize = function()
                 if not actor:skill_util_update_heaven_cracker(actor, skill_hook.damage) then
                     local buff_shadow_clone = Buff.find("ror", "shadowClone")
                     for i=0, GM.get_buff_stack(actor, buff_shadow_clone) do
-                        local attack = GM._mod_attack_fire_explosion(actor, actor.x + attack_offset, actor.y, hook_width, hook_height, skill_hook.damage, -1, gm.constants.sSparks17_PROV)
+                        local attack = actor:fire_explosion(actor.x + attack_offset, actor.y, hook_width, hook_height, skill_hook.damage, -1, gm.constants.sSparks17_PROV)
+                        
                         attack.attack_info.stun = 1
                         attack.attack_info.climb = i * 8
                     end
@@ -329,34 +330,33 @@ initialize = function()
     end)
 
     state_hookB:onStep(function(actor, data)
-        local actorAC = actor.value
-        actorAC:skill_util_fix_hspeed()
-        actorAC:actor_animation_set(sFishmongerPrimary1_2, 0.25)
+        actor:skill_util_fix_hspeed()
+        actor:actor_animation_set(sFishmongerPrimary1_2, 0.25)
 
-        if data.fired == 0 and actorAC.image_index >= 3 then
-            local damage = actorAC:skill_get_damage(skill_hook.value)
+        if data.fired == 0 and actor.image_index >= 3 then
+            local damage = actor:skill_get_damage(skill_hook.value)
 
             local attack_offset = hook_attack_offset
-            if actorAC:skill_util_facing_direction() == 180 then 
+            if actor:skill_util_facing_direction() == 180 then 
                 attack_offset = -attack_offset
             end
 
             if gm._mod_net_isHost() then
-                if not actorAC:skill_util_update_heaven_cracker(actorAC, damage) then
+                if not actor:skill_util_update_heaven_cracker(actor, damage) then
                     local buff_shadow_clone = Buff.find("ror", "shadowClone")
-                    for i=0, GM.get_buff_stack(actorAC, buff_shadow_clone.value) do
-                        local attack = gm._mod_attack_fire_explosion(actorAC, actorAC.x + attack_offset, actorAC.y, hook_width, hook_height, damage, -1, gm.constants.sSparks17_PROV)
+                    for i=0, GM.get_buff_stack(actor, buff_shadow_clone.value) do
+                        local attack = actor:fire_explosion(actor.x + attack_offset, actor.y, hook_width, hook_height, damage, -1, gm.constants.sSparks17_PROV)
                         attack.attack_info.stun = 1
                         attack.attack_info.climb = i * 8
                     end
                 end
             end
 
-            actorAC:sound_play(gm.constants.wMercenaryShoot1_3, 1, 0.9 + math.random() * 0.2)
+            actor:sound_play(gm.constants.wMercenaryShoot1_3, 1, 0.9 + math.random() * 0.2)
             data.fired = 1
         end
 
-        actorAC:skill_util_exit_state_on_anim_end()
+        actor:skill_util_exit_state_on_anim_end()
     end)
 
     --[[
@@ -441,7 +441,7 @@ initialize = function()
                 attack_offset = -attack_offset
             end
             
-            if gm._mod_net_isHost() then
+            --if gm._mod_net_isHost() then
                 local buff_shadow_clone = Buff.find("ror", "shadowClone")
                 for i=0, GM.get_buff_stack(actor, buff_shadow_clone) do
                     local net = ensnaring_net:create(actor.x + attack_offset, actor.y - 3)
@@ -453,7 +453,7 @@ initialize = function()
                     instData.parent = actor
                     instData.team = actor.team
                 end
-            end
+            --end
 
             
             data.fired = 2
@@ -509,10 +509,10 @@ initialize = function()
                 attack_offset = -attack_offset
             end
             
-            if gm._mod_net_isHost() then
+            --if gm._mod_net_isHost() then
                 local buff_shadow_clone = Buff.find("ror", "shadowClone")
                 for i=0, GM.get_buff_stack(actor, buff_shadow_clone) do
-                    local attack = GM._mod_attack_fire_explosion(actor, actor.x + attack_offset, actor.y, splash_width, splash_height, damage, -1, gm.constants.sSparks17_PROV)
+                    local attack = actor:fire_explosion(actor.x + attack_offset, actor.y, splash_width, splash_height, damage, -1, gm.constants.sSparks17_PROV)
                     
                     attack.attack_info.stun = 1 -- change stun duration?
                     attack.attack_info.climb = i * 8
@@ -522,7 +522,7 @@ initialize = function()
                     local wave = splash:create(actor.x + attack_offset, actor.y)
                     wave.image_xscale = gm.cos(gm.degtorad(actor:skill_util_facing_direction()))
                 end
-            end
+            --end
 
             actor:sound_play(sound_splash, 1, 0.9 + math.random() * 0.2)
             data.fired = 1
@@ -607,7 +607,7 @@ initialize = function()
             for _, actor in ipairs(actors) do
                 if (actor.team and actor.team ~= selfData.team)
                 or (actor.parent and actor.parent.team and actor.parent.team ~= selfData.team) then
-                    GM._mod_attack_fire_explosion(selfData.parent, inst.x, inst.y, live_bait_width, live_bait_height, skill_live_bait.damage, -1, gm.constants.sSparks17_PROV)
+                    selfData.parent:fire_explosion(inst.x, inst.y, live_bait_width, live_bait_height, skill_live_bait.damage, -1, gm.constants.sSparks17_PROV)
                     selfData.lastDamaged = live_bait_damage_cooldown
                 end
             end
@@ -645,7 +645,7 @@ initialize = function()
                 attack_offset = -attack_offset
             end
             
-            if gm._mod_net_isHost() then
+            --if gm._mod_net_isHost() then
                 local buff_shadow_clone = Buff.find("ror", "shadowClone")
                 for i=0, GM.get_buff_stack(actor, buff_shadow_clone) do
                     for i=0, live_bait_number-1 do
@@ -668,7 +668,7 @@ initialize = function()
                         instData.team = actor.team
                     end
                 end
-            end
+            --end
 
             actor:sound_play(gm.constants.wGeyser, 1, 0.9 + math.random() * 0.2)
             data.fired = 1
@@ -708,7 +708,7 @@ initialize = function()
 
         -- Attack
         if inst.image_index >= 2.0 and not selfData.chomp then 
-            local attack = GM._mod_attack_fire_explosion(selfData.parent, inst.x, inst.y, live_bait_boosted_width, live_bait_boosted_height, skill_live_bait_boosted.damage, -1, gm.constants.sSparks17_PROV)
+            local attack = selfData.parent:fire_explosion(inst.x, inst.y, live_bait_boosted_width, live_bait_boosted_height, skill_live_bait_boosted.damage, -1, gm.constants.sSparks17_PROV)
             attack.shark_bleed = true
             attack.execute = true
             selfData.chomp = true
@@ -769,7 +769,7 @@ initialize = function()
                 attack_offset = -attack_offset
             end
             
-            if gm._mod_net_isHost() then
+            --if gm._mod_net_isHost() then
                 local buff_shadow_clone = Buff.find("ror", "shadowClone")
                 for i=0, GM.get_buff_stack(actor, buff_shadow_clone) do
                     local shark = live_bait_boosted:create(actor.x + attack_offset, actor.y - 1.1)
@@ -789,7 +789,7 @@ initialize = function()
                     instData.parent = actor
                     instData.team = actor.team
                 end
-            end
+            --end
 
             actor:sound_play(gm.constants.wGeyser, 1, 0.9 + math.random() * 0.2)
             data.fired = 1
@@ -839,7 +839,7 @@ initialize = function()
     still_fishing_damage:onStep(function(inst)
         local selfData = inst:get_data()
         if inst.image_index < 0.2 then
-            local attack = GM._mod_attack_fire_explosion(selfData.parent, inst.x, inst.y, still_fishing_width, still_fishing_height, skill_still_fishing.damage, -1, gm.constants.sSparks17_PROV)
+            local attack = selfData.parent:fire_explosion(inst.x, inst.y, still_fishing_width, still_fishing_height, skill_still_fishing.damage, -1, gm.constants.sSparks17_PROV)
             attack.shark_bleed = true
         elseif inst.image_index > 3 then
             inst:destroy()
@@ -881,7 +881,7 @@ initialize = function()
                 attack_offset = -attack_offset
             end
             
-            if gm._mod_net_isHost() then
+            --if gm._mod_net_isHost() then
                 local buff_shadow_clone = Buff.find("ror", "shadowClone")
                 for i=0, GM.get_buff_stack(actor, buff_shadow_clone) do
                     -- create an oArtiSnap and repurpose it
@@ -892,7 +892,7 @@ initialize = function()
                     Alarm.create(set_still_fishing, 1, inst, actor.value)
                     Alarm.create(set_still_fishing, 2, inst, actor.value)
                 end
-            end
+            --end
 
             actor:sound_play(gm.constants.wGeyser, 1, 0.9 + math.random() * 0.2)
             data.fired = 1
