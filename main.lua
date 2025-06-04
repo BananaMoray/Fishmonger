@@ -3,9 +3,9 @@
 -- Frithuritaks feat. SmoothSpatula
 log.info("Successfully loaded ".._ENV["!guid"]..".")
 
-mods["RoRRModdingToolkit-RoRR_Modding_Toolkit"].auto()
+mods["RoRRModdingToolkit-RoRR_Modding_Toolkit"].auto(true)
 
-if hot_reloading then
+if hot_reloading then -- debug_only
     initialize()
 end
 hot_reloading = true
@@ -15,7 +15,7 @@ local NAMESPACE = "BananaMoray"
 
 initialize = function()
     -- Display Explosion hitbox
-    gm.object_set_visible(gm.constants.oExplosionAttack, true)
+    gm.object_set_visible(gm.constants.oExplosionAttack, true) -- debug_only
 
     -- == Section Sprites == --
 
@@ -24,6 +24,7 @@ initialize = function()
     -- Resources.sprite_load(namespace, identifier, path, [img_num], [x_orig], [y_orig])
     local sFishmongerPortrait = Resources.sprite_load(NAMESPACE, "sFishmongerPortrait", path.combine(PATH, "Sprites", "sFishmongerPortrait.png"), 3)
     local sFishmongerPortraitSmall = Resources.sprite_load(NAMESPACE, "sFishmongerPortraitSmall", path.combine(PATH, "Sprites", "sFishmongerPortraitSmall.png"))
+    local sFishmongerPortraitBig = Resources.sprite_load(NAMESPACE, "sFishmongerPortraitBig", path.combine(PATH, "Sprites", "sFishmongerPortraitBig.png"))
     local sFishmongerSkills = Resources.sprite_load(NAMESPACE, "sFishmongerSkills", path.combine(PATH, "Sprites", "sFishmongerSkills.png"), 9)
     local sSelectFishmonger = Resources.sprite_load(NAMESPACE, "sSelectFishmonger", path.combine(PATH, "Sprites", "sSelectFishmonger.png"), 4, 28, 0)
 
@@ -78,13 +79,11 @@ initialize = function()
 
     -- == Section Audio == --
 
-    local shoot_sfx = gm.audio_create_stream(path.combine(PATH, "Sprites", "shoot.ogg"))
-    if shoot_sfx ~= -1 then 
-        log.info("Loaded death sfx.")
-    else
-        log.info("Failed to load sfx")
-    end
-
+    local sound_shark_bite = Resources.sfx_load(NAMESPACE, "FishmongerSharkBite", path.combine(PATH, "Sounds", "Cartoon Bite sound effect.ogg"))
+    local sound_splash = Resources.sfx_load(NAMESPACE, "FishmongerSplash", path.combine(PATH, "Sounds", "splash-fx.ogg"))
+    local sound_throw = Resources.sfx_load(NAMESPACE, "FishmongerThrow", path.combine(PATH, "Sounds", "Throw Sound Effect - Free.ogg"))
+    local sound_fishing_net = Resources.sfx_load(NAMESPACE, "FishmongerFishingNet", path.combine(PATH, "Sounds", "Fishing net.ogg"))
+    
     -- == Section Setup + Stats == --
 
     local bullet_speed = 10.0
@@ -97,7 +96,7 @@ initialize = function()
     local hook_height = 35
 
     -- Secondary 
-    local ensnaring_net_duration = 60
+    local ensnaring_net_duration = 180
     local ensnaring_net_stun_duration = 10
 
     -- Utility
@@ -119,6 +118,7 @@ initialize = function()
     local live_bait_boosted_height = 40
     local live_bait_boosted_width = 40
     local live_bait_boosted_duration = 240
+    local live_bait_boosted_scale = 1.2
 
     -- Alt Special
     local still_fishing_height = 60
@@ -178,8 +178,7 @@ initialize = function()
     })
 
     -- Create survivor log
-    local fishmonger_log = Survivor_Log.new(fishmonger)
-
+    local fishmonger_log = Survivor_Log.new(fishmonger, sFishmongerPortraitBig)
 
     -- == Section skills == --
 
@@ -297,28 +296,26 @@ initialize = function()
 
     state_hookA:onStep(function(actor, data)
         actor:skill_util_fix_hspeed()
-        
         actor:actor_animation_set(sFishmongerPrimary1_1, 0.25)
-
         if data.fired == 0 and actor.image_index >= 3 then
-
+            
             local attack_offset = hook_attack_offset
             if actor:skill_util_facing_direction() == 180 then 
                 attack_offset = -attack_offset
             end
-
-            if actor:is_authority() then
+            
+            if gm._mod_net_isHost() then
                 if not actor:skill_util_update_heaven_cracker(actor, skill_hook.damage) then
                     local buff_shadow_clone = Buff.find("ror", "shadowClone")
                     for i=0, GM.get_buff_stack(actor, buff_shadow_clone) do
                         local attack = GM._mod_attack_fire_explosion(actor, actor.x + attack_offset, actor.y, hook_width, hook_height, skill_hook.damage, -1, gm.constants.sSparks17_PROV)
-                        attack.attack_info.stun = true
+                        attack.attack_info.stun = 1
                         attack.attack_info.climb = i * 8
                     end
                 end
+                
             end
 
-            -- gm.sound_play_at(gm.constants.wMercenaryShoot1_3, 1, 1, actor.x, actor.y, 500)
             actor:sound_play(gm.constants.wMercenaryShoot1_3, 1, 0.9 + math.random() * 0.2)
             data.fired = 1
         end
@@ -333,9 +330,7 @@ initialize = function()
 
     state_hookB:onStep(function(actor, data)
         local actorAC = actor.value
-
         actorAC:skill_util_fix_hspeed()
-
         actorAC:actor_animation_set(sFishmongerPrimary1_2, 0.25)
 
         if data.fired == 0 and actorAC.image_index >= 3 then
@@ -346,12 +341,12 @@ initialize = function()
                 attack_offset = -attack_offset
             end
 
-            if actorAC:is_authority() then
+            if gm._mod_net_isHost() then
                 if not actorAC:skill_util_update_heaven_cracker(actorAC, damage) then
                     local buff_shadow_clone = Buff.find("ror", "shadowClone")
                     for i=0, GM.get_buff_stack(actorAC, buff_shadow_clone.value) do
                         local attack = gm._mod_attack_fire_explosion(actorAC, actorAC.x + attack_offset, actorAC.y, hook_width, hook_height, damage, -1, gm.constants.sSparks17_PROV)
-                        attack.attack_info.stun = true
+                        attack.attack_info.stun = 1
                         attack.attack_info.climb = i * 8
                     end
                 end
@@ -370,24 +365,19 @@ initialize = function()
 
     -- Ensnaring net
 
-    local ensnaring_net_direction = 1
-    local ensnaring_team = 1
     local ensnaring_net = Object.new(NAMESPACE, "fishmongerNet")
     ensnaring_net:set_sprite(sFishmongerNet)
     ensnaring_net:set_depth(1)
 
     ensnaring_net:onCreate(function(inst)
         inst.image_index = 0
-        inst.image_xscale = ensnaring_net_direction
         inst.floored = 0
         inst.gravity = 0.1
-        inst.hspeed = 1.5 * ensnaring_net_direction
         inst.vspeed = -0.5
         inst.gravity_direction = 270
 
         local selfData = inst:get_data()
         selfData.stopped = 0
-        selfData.team = ensnaring_team
     end)
 
     ensnaring_net:onStep(function(inst)
@@ -409,7 +399,8 @@ initialize = function()
             if selfData.stopped > ensnaring_net_duration then
                 inst:destroy()
             end
-        elseif inst:is_colliding(gm.constants.pSolidBulletCollision) then
+        elseif inst:is_colliding(gm.constants.pSolidBulletCollision) or inst:is_colliding(gm.constants.pSolidBulletCollision) then
+            inst:sound_play(sound_fishing_net, 1, 1)
             inst.gravity = 0
             inst.vspeed = 0
             inst.hspeed = 0
@@ -437,7 +428,12 @@ initialize = function()
 
         actor:actor_animation_set(sFishmongerSecondary1, 0.20)
 
-        if data.fired == 0 and actor.image_index >= 8 then
+        if data.fired == 0  and actor.image_index >= 6 then
+            data.fired = 1
+            actor:sound_play(sound_throw, 1, 0.9 + math.random() * 0.2)
+        end
+
+        if data.fired < 2 and actor.image_index >= 8 then
             local damage = actor:skill_get_damage(skill_ensnaring_net.value)
 
             local attack_offset = 60
@@ -445,17 +441,22 @@ initialize = function()
                 attack_offset = -attack_offset
             end
             
-            if actor:is_authority() then
+            if gm._mod_net_isHost() then
                 local buff_shadow_clone = Buff.find("ror", "shadowClone")
                 for i=0, GM.get_buff_stack(actor, buff_shadow_clone) do
-                    ensnaring_net_direction = gm.cos(gm.degtorad(actor:skill_util_facing_direction()))
-                    ensnaring_team = actor.team
-                    ensnaring_net:create(actor.x + attack_offset, actor.y - 3)
+                    local net = ensnaring_net:create(actor.x + attack_offset, actor.y - 3)
+                    net.direction = actor:skill_util_facing_direction()
+                    net.image_xscale = gm.cos(gm.degtorad(actor:skill_util_facing_direction()))
+                    net.team = actor.team
+                    net.hspeed = 1.5 * net.image_xscale
+                    local instData = net:get_data()
+                    instData.parent = actor
+                    instData.team = actor.team
                 end
             end
 
-            actor:sound_play(gm.constants.wGeyser, 1, 0.9 + math.random() * 0.2)
-            data.fired = 1
+            
+            data.fired = 2
         end
 
         actor:skill_util_exit_state_on_anim_end()
@@ -467,14 +468,12 @@ initialize = function()
     ]]--
 
     -- Splash Object
-    local splash_direction = 1
     local splash = Object.new(NAMESPACE, "fishmongerSplash")
     splash:set_sprite(sFishmongerGeyser)
     splash:set_depth(1)
 
     splash:onCreate(function(inst)
         inst.image_index = 0
-        inst.image_xscale = splash_direction
         inst.knockup_force = splash_knockup_force
         inst.damage = splash_damage
         inst.fired = 0
@@ -482,13 +481,6 @@ initialize = function()
 
     splash:onStep(function(inst)
         inst.image_speed = 0.25
-        --if inst.fired == 0 and inst.image_index >= 1 then
-            --local attack = gm._mod_attack_fire_explosion_noparent(inst.x, inst.y, splash_width, splash_height, 1, inst.damage, false, -1, gm.constants.sSparks17_PROV)
-            --attack.attack_info.stun = true -- change stun duration?
-            --attack.attack_info.knockup = inst.knockup_force
-            
-        --    inst.fired = 1
-        --else
         if inst.image_index >= 8.0 then
             inst:destroy()
         end
@@ -517,26 +509,28 @@ initialize = function()
                 attack_offset = -attack_offset
             end
             
-            if actor:is_authority() then
+            if gm._mod_net_isHost() then
                 local buff_shadow_clone = Buff.find("ror", "shadowClone")
                 for i=0, GM.get_buff_stack(actor, buff_shadow_clone) do
                     local attack = GM._mod_attack_fire_explosion(actor, actor.x + attack_offset, actor.y, splash_width, splash_height, damage, -1, gm.constants.sSparks17_PROV)
-                    attack.attack_info.stun = true -- change stun duration?
+                    
+                    attack.attack_info.stun = 1 -- change stun duration?
                     attack.attack_info.climb = i * 8
-                    attack.attack_info.knockup = splash_knockup_force
+                    attack.splashed = true
+                    attack.splashed_direction = gm.cos(gm.degtorad(actor:skill_util_facing_direction()))
 
-                    splash_direction = gm.cos(gm.degtorad(actor:skill_util_facing_direction()))
-                    splash:create(actor.x + attack_offset, actor.y)
+                    local wave = splash:create(actor.x + attack_offset, actor.y)
+                    wave.image_xscale = gm.cos(gm.degtorad(actor:skill_util_facing_direction()))
                 end
             end
 
-            actor:sound_play(gm.constants.wGeyser, 1, 0.9 + math.random() * 0.2)
+            actor:sound_play(sound_splash, 1, 0.9 + math.random() * 0.2)
             data.fired = 1
         elseif data.slide == 0 and actor.image_index >= 2 then
 
             actor.pHspeed = -gm.cos(gm.degtorad(actor:skill_util_facing_direction())) * actor.pHmax * slash_slide_force
 
-            actor:sound_play(gm.constants.wCommandoRoll, 1, 0.9 + math.random() * 0.2)
+            actor:sound_play(sound_splash, 1, 0.9 + math.random() * 0.2)
             data.slide = 1
         end
 
@@ -553,12 +547,18 @@ initialize = function()
         actor:skill_util_exit_state_on_anim_end()
     end)
 
-    --[[
+
+    fishmonger:add_instance_callback(function(obj_inst, hit_inst, hit_x, hit_y)
+        if not obj_inst.splashed or hit_inst.dead == nil then return end
+
+        hit_inst.pVspeed = hit_inst.pVspeed - 10
+        hit_inst.pHspeed = hit_inst.pHspeed - (4 * obj_inst.splashed_direction)
+    end)
+    --[[--------------------------------------------------------------------
         Subsection Special1 Skill 
-    ]]--
+    ]]----------------------------------------------------------------------
 
     -- Fishies
-    local live_bait_direction = 1
     local live_bait = Object.new(NAMESPACE, "fishmongerLiveBait")
     live_bait:set_sprite(sFishmongerLiveBait)
     live_bait:set_depth(1)
@@ -571,12 +571,9 @@ initialize = function()
 
         inst.image_index = selfData.nb
 
-        inst.image_xscale = live_bait_direction*live_bait_scale
-        inst.image_yscale = live_bait_scale
         inst.vspeed = -0.1
         inst.gravity = 0.15
         inst.image_speed = 0
-        inst.hspeed = (math.random()*0.5 + 0.3) * live_bait_direction
 
         selfData.image_index_offset = 0
     end)
@@ -584,15 +581,27 @@ initialize = function()
     live_bait:onStep(function(inst)
         local selfData = inst:get_data()
 
-        inst.image_angle = inst.image_angle + 3
+        inst.image_angle = inst.image_angle + 3*inst.image_xscale
 
         selfData.image_index_offset = (selfData.image_index_offset + 0.15) % 1.9
         inst.image_index = selfData.nb + selfData.image_index_offset
 
-        if inst:is_colliding(gm.constants.pSolidBulletCollision) then
-            inst.vspeed = -3
-        end
 
+        -- ground collissions 
+        local speedx = inst.hspeed + gm.sign(inst.hspeed) * 0.5
+		local speedy = inst.vspeed + gm.sign(inst.vspeed) * 0.5
+
+		local bounce_h = inst:is_colliding(gm.constants.pBlock, inst.x + speedx, inst.y)
+		local bounce_v = inst:is_colliding(gm.constants.pBlock, inst.x, inst.y + speedy)
+		if bounce_h then
+			inst.hspeed = inst.hspeed * -1.0
+            inst.image_xscale = - inst.image_xscale
+		end
+		if bounce_v then
+			inst.vspeed = -3
+		end
+
+        -- damage collisions
         if selfData.lastDamaged < 0 then
             local actors = inst:get_collisions(gm.constants.pActor)
             for _, actor in ipairs(actors) do
@@ -629,23 +638,34 @@ initialize = function()
         actor:actor_animation_set(sFishmongerSpecial1, 0.25)
 
         if data.fired == 0 and actor.image_index >=4 then
-            local damage = actor:skill_get_damage(skill_ensnaring_net.value)
+            local damage = actor:skill_get_damage(skill_live_bait.value)
 
             local attack_offset = 20
             if actor:skill_util_facing_direction() == 180 then 
                 attack_offset = -attack_offset
             end
             
-            if actor:is_authority() then
+            if gm._mod_net_isHost() then
                 local buff_shadow_clone = Buff.find("ror", "shadowClone")
                 for i=0, GM.get_buff_stack(actor, buff_shadow_clone) do
                     for i=0, live_bait_number-1 do
-                        local inst = live_bait:create(actor.x + attack_offset, actor.y)
-                        local instData = inst:get_data()
+                        local fishie = live_bait:create(actor.x + attack_offset, actor.y )
+                        fishie.direction = actor:skill_util_facing_direction()
+                        fishie.parent = actor
+                        fishie.team = actor.team
+                        if fishie.direction == 180.0 then
+                            fishie.image_xscale = - live_bait_scale
+                            fishie.hspeed = -(math.random()*0.5 + 0.3)
+                        else
+                            fishie.image_xscale = live_bait_scale
+                            fishie.hspeed = (math.random()*0.5 + 0.3)
+                        end
+                        
+                        fishie.image_yscale = live_bait_scale
+
+                        local instData = fishie:get_data()
                         instData.parent = actor
                         instData.team = actor.team
-                        instData.direction = gm.cos(gm.degtorad(actor:skill_util_facing_direction()))
-                        live_bait_direction = gm.cos(gm.degtorad(actor:skill_util_facing_direction()))
                     end
                 end
             end
@@ -658,49 +678,68 @@ initialize = function()
     end)
 
 
-    --[[
-        Subsection Special1 Boosted Skill
-    ]]--
+    --[[--------------------------------------------------------------------
+        Subsection Special1 Boosted Skill - Shark 
+    ]]----------------------------------------------------------------------
 
     
     -- Shark
-    local live_bait_boosted_direction = 1
     local live_bait_boosted = Object.new(NAMESPACE, "fishmongerLiveBaitBoosted")
     live_bait_boosted:set_sprite(sFishmongerLiveBaitBoosted)
     live_bait_boosted:set_depth(1)
 
     live_bait_boosted:onCreate(function(inst)
         local selfData = inst:get_data()
-        selfData.nb = math.random(0, 3) * 2
         selfData.duration = live_bait_boosted_duration
-        selfData.lastDamaged = 0
 
-        inst.image_index = selfData.nb
-
-        inst.image_xscale = live_bait_boosted_direction--*live_bait_boosted_scale
-        --inst.image_yscale = live_bait_boosted_scale
-        inst.vspeed = -0.1
+        inst.hspeed = 2 * inst.image_xscale
+        
+        inst.vspeed = - 0.1
         inst.gravity = 0.15
-        inst.gravity_direction = 267
-        inst.image_speed = 0.2
-        inst.hspeed = 2 * live_bait_boosted_direction
+        --inst.image_speed = 0.2
 
-        selfData.image_index_offset = 0
+        selfData.previous_x = inst.x
+        selfData.previous_y = inst.y
+        selfData.chomp = false
     end)
 
     live_bait_boosted:onStep(function(inst)
         local selfData = inst:get_data()
 
-        if inst.image_index >= 2.0 and inst.image_index < 2.2 then
+        -- Attack
+        if inst.image_index >= 2.0 and not selfData.chomp then 
             local attack = GM._mod_attack_fire_explosion(selfData.parent, inst.x, inst.y, live_bait_boosted_width, live_bait_boosted_height, skill_live_bait_boosted.damage, -1, gm.constants.sSparks17_PROV)
             attack.shark_bleed = true
             attack.execute = true
+            selfData.chomp = true
+        else 
+            selfData.chomp = false
         end
 
-        if inst:is_colliding(gm.constants.pSolidBulletCollision) then
-            inst.vspeed = -2.5
+        -- Collisions
+        local speedx = inst.hspeed + gm.sign(inst.hspeed) * 0.5
+		local speedy = inst.vspeed + gm.sign(inst.vspeed) * 0.5
+
+        if speedx < 0.1 then 
+            speedx = 0.1
         end
 
+		local bounce_h = inst:is_colliding(gm.constants.pBlock, inst.x + speedx, inst.y)
+		local bounce_v = inst:is_colliding(gm.constants.pBlock, inst.x, inst.y + speedy)
+		if bounce_h then
+			inst.hspeed = inst.hspeed * -1.0
+            inst.image_xscale = - inst.image_xscale
+            if inst.gravity_direction == 267 then
+                inst.gravity_direction = 273
+            else 
+                inst.gravity_direction = 267
+            end
+		end
+		if bounce_v then
+			inst.vspeed = -2.5
+		end
+
+        -- Duration
         selfData.duration = selfData.duration - 1
         if selfData.duration < 0 then 
             inst:destroy()
@@ -730,15 +769,25 @@ initialize = function()
                 attack_offset = -attack_offset
             end
             
-            if actor:is_authority() then
+            if gm._mod_net_isHost() then
                 local buff_shadow_clone = Buff.find("ror", "shadowClone")
                 for i=0, GM.get_buff_stack(actor, buff_shadow_clone) do
-                        local inst = live_bait_boosted:create(actor.x + attack_offset, actor.y)
-                        local instData = inst:get_data()
-                        instData.parent = actor
-                        instData.team = actor.team
-                        instData.direction = gm.cos(gm.degtorad(actor:skill_util_facing_direction()))
-                        live_bait_boosted_direction = gm.cos(gm.degtorad(actor:skill_util_facing_direction()))
+                    local shark = live_bait_boosted:create(actor.x + attack_offset, actor.y - 1.1)
+                    shark.direction = actor:skill_util_facing_direction()
+                    shark.parent = actor
+                    shark.team = actor.team
+                    shark.image_speed = math.log(2.71828 - 1.0 + actor.attack_speed) * 0.2 --log attack speed starts at 1
+                    
+                    if shark.direction == 180.0 then
+                        shark.image_xscale = -1.0
+                        shark.gravity_direction = 273
+                    else
+                        shark.gravity_direction = 267
+                    end
+
+                    local instData = shark:get_data()
+                    instData.parent = actor
+                    instData.team = actor.team
                 end
             end
 
@@ -752,6 +801,7 @@ initialize = function()
     fishmonger:add_instance_callback(function(obj_inst, hit_inst, hit_x, hit_y)
         if not obj_inst.shark_bleed or hit_inst.dead == nil then return end
 
+        hit_inst:sound_play(sound_shark_bite, 0.8, 2.0)
         if hit_inst.hp*5 < hit_inst.maxhp and obj_inst.execute then --kill enemies under 20% hp
             hit_inst:kill()
         end
@@ -831,7 +881,7 @@ initialize = function()
                 attack_offset = -attack_offset
             end
             
-            if actor:is_authority() then
+            if gm._mod_net_isHost() then
                 local buff_shadow_clone = Buff.find("ror", "shadowClone")
                 for i=0, GM.get_buff_stack(actor, buff_shadow_clone) do
                     -- create an oArtiSnap and repurpose it
@@ -853,7 +903,5 @@ initialize = function()
 
 
 end
-
-Initialize(initialize)
 
 Initialize(initialize)
