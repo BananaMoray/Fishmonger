@@ -1,10 +1,11 @@
 {
 	"name": "Fishmonger",
 	"version_number": "1.0.0",
-	"website_url": "",
-	"description": "Adds Fishmonger as a playable character.",
+	"website_url": "https://github.com/BananaMoray/Fishmonger/tree/Rewrite",
+	"description": "She has some fish for you.",
 	"dependencies": [
-		"ReturnOfModding-ReturnOfModding-1.0.32",
-	"RoRRModdingToolkit-RoRR_Modding_Toolkit-1.0.6"
+		"ReturnOfModding-ReturnOfModding-1.0.53",
+		"RoRRModdingToolkit-RoRR_Modding_Toolkit-1.2.0"
+
 	]
 }

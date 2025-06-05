@@ -5,18 +5,10 @@ log.info("Successfully loaded ".._ENV["!guid"]..".")
 
 mods["RoRRModdingToolkit-RoRR_Modding_Toolkit"].auto(true)
 
-if hot_reloading then -- debug_only
-    initialize()
-end
-hot_reloading = true
-
 local PATH = _ENV["!plugins_mod_folder_path"]
 local NAMESPACE = "BananaMoray"
 
 initialize = function()
-    -- Display Explosion hitbox
-    gm.object_set_visible(gm.constants.oExplosionAttack, true) -- debug_only
-
     --[[------------------------------------------
 ░░░░░░░░      ░░░       ░░░       ░░░        ░░        ░░        ░░░      ░░
 ▒▒▒▒▒▒▒  ▒▒▒▒▒▒▒▒  ▒▒▒▒  ▒▒  ▒▒▒▒  ▒▒▒▒▒  ▒▒▒▒▒▒▒▒  ▒▒▒▒▒  ▒▒▒▒▒▒▒▒  ▒▒▒▒▒▒▒
@@ -551,21 +543,19 @@ initialize = function()
             if actor:skill_util_facing_direction() == 180 then 
                 attack_offset = -attack_offset
             end
-            
-            --if gm._mod_net_isHost() then
-                local buff_shadow_clone = Buff.find("ror", "shadowClone")
-                for i=0, GM.get_buff_stack(actor, buff_shadow_clone) do
-                    local attack = actor:fire_explosion(actor.x + attack_offset, actor.y, splash_width, splash_height, damage, -1, gm.constants.sSparks17_PROV)
-                    
-                    attack.attack_info.stun = 1 -- change stun duration?
-                    attack.attack_info.climb = i * 8
-                    attack.splashed = true
-                    attack.splashed_direction = gm.cos(gm.degtorad(actor:skill_util_facing_direction()))
 
-                    local wave = splash:create(actor.x + attack_offset, actor.y)
-                    wave.image_xscale = gm.cos(gm.degtorad(actor:skill_util_facing_direction()))
-                end
-            --end
+            local buff_shadow_clone = Buff.find("ror", "shadowClone")
+            for i=0, GM.get_buff_stack(actor, buff_shadow_clone) do
+                local attack = actor:fire_explosion(actor.x + attack_offset, actor.y, splash_width, splash_height, damage, -1, gm.constants.sSparks17_PROV)
+                
+                attack.attack_info.stun = 1 -- change stun duration?
+                attack.attack_info.climb = i * 8
+                attack.splashed = true
+                attack.splashed_direction = gm.cos(gm.degtorad(actor:skill_util_facing_direction()))
+
+                local wave = splash:create(actor.x + attack_offset, actor.y)
+                wave.image_xscale = gm.cos(gm.degtorad(actor:skill_util_facing_direction()))
+            end
 
             actor:sound_play(sound_splash, 1, 0.9 + math.random() * 0.2)
             data.fired = 1
@@ -643,7 +633,7 @@ initialize = function()
         inst.image_index = selfData.nb + selfData.image_index_offset
 
 
-        -- ground collissions 
+        -- ground collisions 
         local speedx = inst.hspeed + gm.sign(inst.hspeed) * 0.5
 		local speedy = inst.vspeed + gm.sign(inst.vspeed) * 0.5
 
@@ -710,32 +700,28 @@ initialize = function()
                 attack_offset = -attack_offset
             end
             
-            --if gm._mod_net_isHost() then
-                local buff_shadow_clone = Buff.find("ror", "shadowClone")
-                for i=0, GM.get_buff_stack(actor, buff_shadow_clone) do
-                    for i=0, live_bait_number-1 do
-                        local fishie = live_bait:create(actor.x + attack_offset, actor.y - math.random()*40.0 )
-                        fishie.direction = actor:skill_util_facing_direction()
-                        fishie.parent = actor
-                        fishie.team = actor.team
-                        if fishie.direction == 180.0 then
-                            fishie.image_xscale = - live_bait_scale
-                            fishie.hspeed = -(math.random() + 0.3)
-                        else
-                            fishie.image_xscale = live_bait_scale
-                            fishie.hspeed = (math.random() + 0.3)
-                        end
-                        
-                        fishie.image_yscale = live_bait_scale
-
-                        local instData = fishie:get_data()
-                        instData.parent = actor
-                        instData.team = actor.team
+            local buff_shadow_clone = Buff.find("ror", "shadowClone")
+            for i=0, GM.get_buff_stack(actor, buff_shadow_clone) do
+                for i=0, live_bait_number-1 do
+                    local fishie = live_bait:create(actor.x + attack_offset, actor.y - math.random()*40.0 )
+                    fishie.direction = actor:skill_util_facing_direction()
+                    fishie.parent = actor
+                    fishie.team = actor.team
+                    if fishie.direction == 180.0 then
+                        fishie.image_xscale = - live_bait_scale
+                        fishie.hspeed = -(math.random() + 0.3)
+                    else
+                        fishie.image_xscale = live_bait_scale
+                        fishie.hspeed = (math.random() + 0.3)
                     end
-                end
-            --end
+                    
+                    fishie.image_yscale = live_bait_scale
 
-            
+                    local instData = fishie:get_data()
+                    instData.parent = actor
+                    instData.team = actor.team
+                end
+            end
             data.fired = 2
         end
 
@@ -765,7 +751,6 @@ initialize = function()
         
         inst.vspeed = - 0.1
         inst.gravity = 0.15
-        --inst.image_speed = 0.2
 
         selfData.previous_x = inst.x
         selfData.previous_y = inst.y
@@ -843,27 +828,25 @@ initialize = function()
                 attack_offset = -attack_offset
             end
             
-            --if gm._mod_net_isHost() then
-                local buff_shadow_clone = Buff.find("ror", "shadowClone")
-                for i=0, GM.get_buff_stack(actor, buff_shadow_clone) do
-                    local shark = live_bait_boosted:create(actor.x + attack_offset, actor.y - 1.1)
-                    shark.direction = actor:skill_util_facing_direction()
-                    shark.parent = actor
-                    shark.team = actor.team
-                    shark.image_speed = math.log(2.71828 - 1.0 + actor.attack_speed) * 0.2 --log attack speed starts at 1
-                    
-                    if shark.direction == 180.0 then
-                        shark.image_xscale = -1.0
-                        shark.gravity_direction = 273
-                    else
-                        shark.gravity_direction = 267
-                    end
-
-                    local instData = shark:get_data()
-                    instData.parent = actor
-                    instData.team = actor.team
+            local buff_shadow_clone = Buff.find("ror", "shadowClone")
+            for i=0, GM.get_buff_stack(actor, buff_shadow_clone) do
+                local shark = live_bait_boosted:create(actor.x + attack_offset, actor.y - 1.1)
+                shark.direction = actor:skill_util_facing_direction()
+                shark.parent = actor
+                shark.team = actor.team
+                shark.image_speed = math.log(2.71828 - 1.0 + actor.attack_speed) * 0.2 --log attack speed starts at 1
+                
+                if shark.direction == 180.0 then
+                    shark.image_xscale = -1.0
+                    shark.gravity_direction = 273
+                else
+                    shark.gravity_direction = 267
                 end
-            --end
+
+                local instData = shark:get_data()
+                instData.parent = actor
+                instData.team = actor.team
+            end
             data.fired = 2
         end
 
@@ -957,18 +940,16 @@ initialize = function()
                 attack_offset = -attack_offset
             end
             
-            --if gm._mod_net_isHost() then
-                local buff_shadow_clone = Buff.find("ror", "shadowClone")
-                for i=0, GM.get_buff_stack(actor, buff_shadow_clone) do
-                    -- create an oArtiSnap and repurpose it
-                    local inst = still_fishing_bait:create(actor.x, actor.y)
-                    inst.parent = actor.value
-                    inst.sprite_index = sFishmongerBait
-                    -- inst.hp = the hp you want
-                    Alarm.create(set_still_fishing, 1, inst, actor.value)
-                    Alarm.create(set_still_fishing, 2, inst, actor.value)
-                end
-            --end
+            local buff_shadow_clone = Buff.find("ror", "shadowClone")
+            for i=0, GM.get_buff_stack(actor, buff_shadow_clone) do
+                -- create an oArtiSnap and repurpose it
+                local inst = still_fishing_bait:create(actor.x, actor.y)
+                inst.parent = actor.value
+                inst.sprite_index = sFishmongerBait
+                -- inst.hp = the hp you want
+                Alarm.create(set_still_fishing, 1, inst, actor.value)
+                Alarm.create(set_still_fishing, 2, inst, actor.value)
+            end
 
             actor:sound_play(gm.constants.wGeyser, 1, 0.9 + math.random() * 0.2)
             data.fired = 1
