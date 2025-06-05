@@ -91,6 +91,7 @@ initialize = function()
 ████████      ████      ████      ███  ███   ██       ████      ██
     ------------------------------------------]]--
 
+    local sound_select = Resources.sfx_load(NAMESPACE, "FishmongerSelect", path.combine(PATH, "Sounds", "Select.ogg"))
     local sound_shark_bite = Resources.sfx_load(NAMESPACE, "FishmongerSharkBite", path.combine(PATH, "Sounds", "Cartoon Bite sound effect.ogg"))
     local sound_splash = Resources.sfx_load(NAMESPACE, "FishmongerSplash", path.combine(PATH, "Sounds", "splash-fx.ogg"))
     local sound_throw = Resources.sfx_load(NAMESPACE, "FishmongerThrow", path.combine(PATH, "Sounds", "Throw Sound Effect - Free.ogg"))
@@ -117,7 +118,7 @@ initialize = function()
     local hook_height = 35
 
     -- Secondary 
-    local ensnaring_net_duration = 180
+    local ensnaring_net_duration = 240
     local ensnaring_net_stun_duration = 10
 
     -- Utility
@@ -154,6 +155,7 @@ initialize = function()
 
     -- Set the selection animation of the survivor
     fishmonger.sprite_loadout = sSelectFishmonger
+    fishmonger.select_sound_id = sound_select
 
     -- Set the portraits of the survivor
     fishmonger.sprite_portrait = sFishmongerPortrait
@@ -172,7 +174,7 @@ initialize = function()
     fishmonger:set_primary_color(Color.from_rgb(238, 173, 105))
     
     -- Set the Prophet cape offset for the survivor
-    fishmonger:set_cape_offset(0, -9, 3, -1)
+    fishmonger:set_cape_offset(0, -9, 0, -7)
 
     -- Set the survivor's sprites to those we previously loaded
     fishmonger:set_animations(sprites)
@@ -182,7 +184,7 @@ initialize = function()
 
     fishmonger:set_stats_base({ -- Set the player's starting stats
         maxhp = 110,
-        damage = 24,
+        damage = 16,
         regen = 0.01, -- health regen per frame, so 0.6 per second
         -- vmax = jump_force
     })
@@ -215,19 +217,19 @@ initialize = function()
 
     local skill_ensnaring_net = fishmonger:get_secondary()
     skill_ensnaring_net:set_skill_icon(sFishmongerSkills, 1)
-    skill_ensnaring_net:set_skill_properties(2.0, 0)
+    skill_ensnaring_net:set_skill_properties(2.0, 5* 60)
     skill_ensnaring_net:set_skill_animation(sprites.idle)
     skill_ensnaring_net.require_key_press = true
 
     local skill_splash = fishmonger:get_utility()
     skill_splash:set_skill_icon(sFishmongerSkills, 2)
-    skill_splash:set_skill_properties(3.0, 1 * 60)
+    skill_splash:set_skill_properties(3.0, 4 * 60)
     skill_splash:set_skill_animation(sFishmongerUtility1)
     skill_splash.require_key_press = true
 
     local skill_live_bait = fishmonger:get_special()
     skill_live_bait:set_skill_icon(sFishmongerSkills, 3)
-    skill_live_bait:set_skill_properties(0.8, 5 * 60)
+    skill_live_bait:set_skill_properties(0.8, 10 * 60)
     skill_live_bait:set_skill_animation(sFishmongerSpecial1)
     skill_live_bait.require_key_press = true
 
@@ -276,7 +278,8 @@ initialize = function()
         false
     )
     skill_still_fishing_boosted.require_key_press = true
-    skill_still_fishing:set_skill_upgrade(skill_still_fishing_boosted)
+    --skill_still_fishing:set_skill_upgrade(skill_still_fishing_boosted)
+    skill_still_fishing:set_skill_upgrade(skill_live_bait_boosted)
 
 
     -- Create State skill
@@ -339,7 +342,7 @@ initialize = function()
                     for i=0, GM.get_buff_stack(actor, buff_shadow_clone) do
                         local attack = actor:fire_explosion(actor.x + attack_offset, actor.y, hook_width, hook_height, skill_hook.damage, -1, gm.constants.sSparks17_PROV)
                         
-                        attack.attack_info.stun = 1
+                        attack.attack_info:set_stun(0.2)
                         attack.attack_info.climb = i * 8
                     end
                 end
@@ -375,7 +378,10 @@ initialize = function()
                     local buff_shadow_clone = Buff.find("ror", "shadowClone")
                     for i=0, GM.get_buff_stack(actor, buff_shadow_clone.value) do
                         local attack = actor:fire_explosion(actor.x + attack_offset, actor.y, hook_width, hook_height, damage, -1, gm.constants.sSparks17_PROV)
-                        attack.attack_info.stun = 1
+                        --attack.attack_info.stun = 1
+                        attack.attack_info.knockback = 4
+                        attack.attack_info.knockback_direction = -actor.image_xscale
+                        attack.attack_info:set_stun(0.2)
                         attack.attack_info.climb = i * 8
                     end
                 end
@@ -591,6 +597,15 @@ initialize = function()
         hit_inst.pVspeed = hit_inst.pVspeed - 10
         hit_inst.pHspeed = hit_inst.pHspeed - (4 * obj_inst.splashed_direction)
     end)
+
+        --[[------------------------------------------
+░░░░░░░░      ░░░       ░░░        ░░░      ░░░        ░░░      ░░░  ░░░░░░░░░      ░░
+▒▒▒▒▒▒▒  ▒▒▒▒▒▒▒▒  ▒▒▒▒  ▒▒  ▒▒▒▒▒▒▒▒  ▒▒▒▒  ▒▒▒▒▒  ▒▒▒▒▒  ▒▒▒▒  ▒▒  ▒▒▒▒▒▒▒▒  ▒▒▒▒▒▒▒
+▓▓▓▓▓▓▓▓      ▓▓▓       ▓▓▓      ▓▓▓▓  ▓▓▓▓▓▓▓▓▓▓▓  ▓▓▓▓▓  ▓▓▓▓  ▓▓  ▓▓▓▓▓▓▓▓▓      ▓▓
+█████████████  ██  ████████  ████████  ████  █████  █████        ██  ██████████████  █
+████████      ███  ████████        ███      ███        ██  ████  ██        ███      ██
+    ------------------------------------------]]--
+
     --[[------------------------------------------
 ░░░░░░░        ░░        ░░░      ░░░  ░░░░  ░░        ░░        ░░░      ░░
 ▒▒▒▒▒▒▒  ▒▒▒▒▒▒▒▒▒▒▒  ▒▒▒▒▒  ▒▒▒▒▒▒▒▒  ▒▒▒▒  ▒▒▒▒▒  ▒▒▒▒▒  ▒▒▒▒▒▒▒▒  ▒▒▒▒▒▒▒
@@ -774,7 +789,7 @@ initialize = function()
         local speedx = inst.hspeed + gm.sign(inst.hspeed) * 0.5
 		local speedy = inst.vspeed + gm.sign(inst.vspeed) * 0.5
 
-        if speedx < 0.1 then 
+        if speedx < 0.1 then  
             speedx = 0.1
         end
 
