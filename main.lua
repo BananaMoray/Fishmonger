@@ -17,7 +17,13 @@ initialize = function()
     -- Display Explosion hitbox
     gm.object_set_visible(gm.constants.oExplosionAttack, true) -- debug_only
 
-    -- == Section Sprites == --
+    --[[------------------------------------------
+░░░░░░░░      ░░░       ░░░       ░░░        ░░        ░░        ░░░      ░░
+▒▒▒▒▒▒▒  ▒▒▒▒▒▒▒▒  ▒▒▒▒  ▒▒  ▒▒▒▒  ▒▒▒▒▒  ▒▒▒▒▒▒▒▒  ▒▒▒▒▒  ▒▒▒▒▒▒▒▒  ▒▒▒▒▒▒▒
+▓▓▓▓▓▓▓▓      ▓▓▓       ▓▓▓       ▓▓▓▓▓▓  ▓▓▓▓▓▓▓▓  ▓▓▓▓▓      ▓▓▓▓▓      ▓▓
+█████████████  ██  ████████  ███  ██████  ████████  █████  ██████████████  █
+████████      ███  ████████  ████  ██        █████  █████        ███      ██
+    ------------------------------------------]]--
 
     -- Menu Sprites
 
@@ -77,7 +83,13 @@ initialize = function()
     gm.sprite_set_speed(sFishmongerSpecial1Boosted, 1, 1)
     gm.sprite_set_speed(sSelectFishmonger, -5, 0) -- loadout Speed
 
-    -- == Section Audio == --
+    --[[------------------------------------------
+░░░░░░░░      ░░░░      ░░░  ░░░░  ░░   ░░░  ░░       ░░░░      ░░
+▒▒▒▒▒▒▒  ▒▒▒▒▒▒▒▒  ▒▒▒▒  ▒▒  ▒▒▒▒  ▒▒    ▒▒  ▒▒  ▒▒▒▒  ▒▒  ▒▒▒▒▒▒▒
+▓▓▓▓▓▓▓▓      ▓▓▓  ▓▓▓▓  ▓▓  ▓▓▓▓  ▓▓  ▓  ▓  ▓▓  ▓▓▓▓  ▓▓▓      ▓▓
+█████████████  ██  ████  ██  ████  ██  ██    ██  ████  ████████  █
+████████      ████      ████      ███  ███   ██       ████      ██
+    ------------------------------------------]]--
 
     local sound_shark_bite = Resources.sfx_load(NAMESPACE, "FishmongerSharkBite", path.combine(PATH, "Sounds", "Cartoon Bite sound effect.ogg"))
     local sound_splash = Resources.sfx_load(NAMESPACE, "FishmongerSplash", path.combine(PATH, "Sounds", "splash-fx.ogg"))
@@ -87,7 +99,13 @@ initialize = function()
     local sound_fish_throw = Resources.sfx_load(NAMESPACE, "FishmongerFishThrow", path.combine(PATH, "Sounds", "FishThrow.ogg"))
     local sound_fish_jump = Resources.sfx_load(NAMESPACE, "FishmongerFishJump", path.combine(PATH, "Sounds", "FishJump.ogg"))
     
-    -- == Section Setup + Stats == --
+    --[[------------------------------------------
+░░░░░░░░      ░░░        ░░░      ░░░        ░░░      ░░
+▒▒▒▒▒▒▒  ▒▒▒▒▒▒▒▒▒▒▒  ▒▒▒▒▒  ▒▒▒▒  ▒▒▒▒▒  ▒▒▒▒▒  ▒▒▒▒▒▒▒
+▓▓▓▓▓▓▓▓      ▓▓▓▓▓▓  ▓▓▓▓▓  ▓▓▓▓  ▓▓▓▓▓  ▓▓▓▓▓▓      ▓▓
+█████████████  █████  █████        █████  ███████████  █
+████████      ██████  █████  ████  █████  ██████      ██
+    ------------------------------------------]]--
 
     local bullet_speed = 10.0
     local jump_force = 8.0
@@ -162,10 +180,6 @@ initialize = function()
     -- Set the survivor's starting stats
     -- (maxhp, damage, regen, armor, attack_speed, critical_chance, maxshield)
 
-    --[[------------------------------------------
-        SECTION STATS
-    ------------------------------------------]]--
-
     fishmonger:set_stats_base({ -- Set the player's starting stats
         maxhp = 110,
         damage = 24,
@@ -183,7 +197,15 @@ initialize = function()
     -- Create survivor log
     local fishmonger_log = Survivor_Log.new(fishmonger, sFishmongerPortraitBig)
 
-    -- == Section skills == --
+        --[[------------------------------------------
+░░░░░░░░      ░░░  ░░░░  ░░        ░░  ░░░░░░░░  ░░░░░░░░░      ░░
+▒▒▒▒▒▒▒  ▒▒▒▒▒▒▒▒  ▒▒▒  ▒▒▒▒▒▒  ▒▒▒▒▒  ▒▒▒▒▒▒▒▒  ▒▒▒▒▒▒▒▒  ▒▒▒▒▒▒▒
+▓▓▓▓▓▓▓▓      ▓▓▓     ▓▓▓▓▓▓▓▓  ▓▓▓▓▓  ▓▓▓▓▓▓▓▓  ▓▓▓▓▓▓▓▓▓      ▓▓
+█████████████  ██  ███  ██████  █████  ████████  ██████████████  █
+████████      ███  ████  ██        ██        ██        ███      ██
+    ------------------------------------------]]--
+
+
 
     local skill_hook = fishmonger:get_primary()
     -- (Sprite Skill, Subimage)
@@ -268,9 +290,13 @@ initialize = function()
     local state_still_fishing_boosted = State.new(NAMESPACE, skill_still_fishing_boosted.identifier)
 
 
-    --[[
-        Subsection Primary Skill 
-    ]]--
+    --[[------------------------------------------
+░░░░░░░       ░░░       ░░░        ░░  ░░░░  ░░░      ░░░       ░░░  ░░░░  ░
+▒▒▒▒▒▒▒  ▒▒▒▒  ▒▒  ▒▒▒▒  ▒▒▒▒▒  ▒▒▒▒▒   ▒▒   ▒▒  ▒▒▒▒  ▒▒  ▒▒▒▒  ▒▒▒  ▒▒  ▒▒
+▓▓▓▓▓▓▓       ▓▓▓       ▓▓▓▓▓▓  ▓▓▓▓▓        ▓▓  ▓▓▓▓  ▓▓       ▓▓▓▓▓    ▓▓▓
+███████  ████████  ███  ██████  █████  █  █  ██        ██  ███  ██████  ████
+███████  ████████  ████  ██        ██  ████  ██  ████  ██  ████  █████  ████
+    ------------------------------------------]]--
 
     local fishmonger_decr_counter = nil
     fishmonger_decr_counter = function(actor)
@@ -362,9 +388,13 @@ initialize = function()
         actor:skill_util_exit_state_on_anim_end()
     end)
 
-    --[[
-        Subsection Secondary Skill
-    ]]--
+    --[[------------------------------------------
+░░░░░░░░      ░░░        ░░░      ░░░░      ░░░   ░░░  ░░       ░░░░      ░░░       ░░░  ░░░░  ░
+▒▒▒▒▒▒▒  ▒▒▒▒▒▒▒▒  ▒▒▒▒▒▒▒▒  ▒▒▒▒  ▒▒  ▒▒▒▒  ▒▒    ▒▒  ▒▒  ▒▒▒▒  ▒▒  ▒▒▒▒  ▒▒  ▒▒▒▒  ▒▒▒  ▒▒  ▒▒
+▓▓▓▓▓▓▓▓      ▓▓▓      ▓▓▓▓  ▓▓▓▓▓▓▓▓  ▓▓▓▓  ▓▓  ▓  ▓  ▓▓  ▓▓▓▓  ▓▓  ▓▓▓▓  ▓▓       ▓▓▓▓▓    ▓▓▓
+█████████████  ██  ████████  ████  ██  ████  ██  ██    ██  ████  ██        ██  ███  ██████  ████
+████████      ███        ███      ████      ███  ███   ██       ███  ████  ██  ████  █████  ████
+    ------------------------------------------]]--
 
     -- Ensnaring net
 
@@ -466,9 +496,13 @@ initialize = function()
     end)
 
 
-    --[[
-        Subsection Utility Skill 
-    ]]--
+    --[[------------------------------------------
+░░░░░░░  ░░░░  ░░        ░░        ░░  ░░░░░░░░        ░░        ░░  ░░░░  ░
+▒▒▒▒▒▒▒  ▒▒▒▒  ▒▒▒▒▒  ▒▒▒▒▒▒▒▒  ▒▒▒▒▒  ▒▒▒▒▒▒▒▒▒▒▒  ▒▒▒▒▒▒▒▒  ▒▒▒▒▒▒  ▒▒  ▒▒
+▓▓▓▓▓▓▓  ▓▓▓▓  ▓▓▓▓▓  ▓▓▓▓▓▓▓▓  ▓▓▓▓▓  ▓▓▓▓▓▓▓▓▓▓▓  ▓▓▓▓▓▓▓▓  ▓▓▓▓▓▓▓    ▓▓▓
+███████  ████  █████  ████████  █████  ███████████  ████████  ████████  ████
+████████      ██████  █████        ██        ██        █████  ████████  ████
+    ------------------------------------------]]--
 
     -- Splash Object
     local splash = Object.new(NAMESPACE, "fishmongerSplash")
@@ -557,9 +591,13 @@ initialize = function()
         hit_inst.pVspeed = hit_inst.pVspeed - 10
         hit_inst.pHspeed = hit_inst.pHspeed - (4 * obj_inst.splashed_direction)
     end)
-    --[[--------------------------------------------------------------------
-        Subsection Special1 Skill 
-    ]]----------------------------------------------------------------------
+    --[[------------------------------------------
+░░░░░░░        ░░        ░░░      ░░░  ░░░░  ░░        ░░        ░░░      ░░
+▒▒▒▒▒▒▒  ▒▒▒▒▒▒▒▒▒▒▒  ▒▒▒▒▒  ▒▒▒▒▒▒▒▒  ▒▒▒▒  ▒▒▒▒▒  ▒▒▒▒▒  ▒▒▒▒▒▒▒▒  ▒▒▒▒▒▒▒
+▓▓▓▓▓▓▓      ▓▓▓▓▓▓▓  ▓▓▓▓▓▓      ▓▓▓        ▓▓▓▓▓  ▓▓▓▓▓      ▓▓▓▓▓      ▓▓
+███████  ███████████  ███████████  ██  ████  █████  █████  ██████████████  █
+███████  ████████        ███      ███  ████  ██        ██        ███      ██
+    ------------------------------------------]]--
 
     -- Fishies
     local live_bait = Object.new(NAMESPACE, "fishmongerLiveBait")
@@ -690,9 +728,13 @@ initialize = function()
     end)
 
 
-    --[[--------------------------------------------------------------------
-        Subsection Special1 Boosted Skill - Shark 
-    ]]----------------------------------------------------------------------
+    --[[------------------------------------------
+░░░░░░░░      ░░░  ░░░░  ░░░      ░░░       ░░░  ░░░░  ░
+▒▒▒▒▒▒▒  ▒▒▒▒▒▒▒▒  ▒▒▒▒  ▒▒  ▒▒▒▒  ▒▒  ▒▒▒▒  ▒▒  ▒▒▒  ▒▒
+▓▓▓▓▓▓▓▓      ▓▓▓        ▓▓  ▓▓▓▓  ▓▓       ▓▓▓     ▓▓▓▓
+█████████████  ██  ████  ██        ██  ███  ███  ███  ██
+████████      ███  ████  ██  ████  ██  ████  ██  ████  █
+    ------------------------------------------]]--
 
     
     -- Shark
@@ -831,9 +873,13 @@ initialize = function()
         dot.sprite_index = gm.constants.sSparks9
     end)
 
-    --[[
-        Subsection Special2 Skill 
-    ]]--
+    --[[--------------------------------------
+░░░░░░░       ░░░░      ░░░        ░░        ░
+▒▒▒▒▒▒▒  ▒▒▒▒  ▒▒  ▒▒▒▒  ▒▒▒▒▒  ▒▒▒▒▒▒▒▒  ▒▒▒▒
+▓▓▓▓▓▓▓       ▓▓▓  ▓▓▓▓  ▓▓▓▓▓  ▓▓▓▓▓▓▓▓  ▓▓▓▓
+███████  ████  ██        █████  ████████  ████
+███████       ███  ████  ██        █████  ████
+    --------------------------------------]]--
     
     local still_fishing_bait = Object.wrap(gm.constants.oArtiSnap)
 
