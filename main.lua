@@ -133,7 +133,7 @@ initialize = function()
     local live_bait_damage_cooldown = 50
     local live_bait_width = 30
     local live_bait_height = 30
-    local live_bait_number = 4
+    local live_bait_number = 6
     local live_bait_scale = 0.7
 
     -- Special Boosted
