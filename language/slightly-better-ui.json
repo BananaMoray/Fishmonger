@@ -2,7 +2,7 @@
 	"skill" : {
 		"fishmongerZ" : {
 			"name" : "Hook",
-			"description" : "Strike enemies, dealing <y>100% damage</c>. Hitting <y>light enemies</c> will <y>pull them towards you</c>."
+			"description" : "Strike enemies, dealing <y>150% damage</c>. Hitting <y>light enemies</c> will <y>pull them towards you</c>."
 		},
 		"fishmongerX" : {
 			"name" : "Entangling Net",

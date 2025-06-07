@@ -9,6 +9,7 @@ local PATH = _ENV["!plugins_mod_folder_path"]
 local NAMESPACE = "BananaMoray"
 
 initialize = function()
+    gm.object_set_visible(gm.constants.oExplosionAttack, true)
     --[[------------------------------------------
 ░░░░░░░░      ░░░       ░░░       ░░░        ░░        ░░        ░░░      ░░
 ▒▒▒▒▒▒▒  ▒▒▒▒▒▒▒▒  ▒▒▒▒  ▒▒  ▒▒▒▒  ▒▒▒▒▒  ▒▒▒▒▒▒▒▒  ▒▒▒▒▒  ▒▒▒▒▒▒▒▒  ▒▒▒▒▒▒▒
@@ -176,13 +177,13 @@ initialize = function()
 
     fishmonger:set_stats_base({ -- Set the player's starting stats
         maxhp = 110,
-        damage = 16,
+        damage = 14,
         regen = 0.01, -- health regen per frame, so 0.6 per second
         -- vmax = jump_force
     })
     
     fishmonger:set_stats_level({  -- Set the player's leveling stats
-        maxhp = 16,
+        maxhp = 20,
         damage = 4,
         regen = 0.002, -- gain 0.12 health regen per level
         armor = 4
@@ -205,7 +206,7 @@ initialize = function()
     -- (Sprite Skill, Subimage)
     skill_hook:set_skill_icon(sFishmongerSkills, 0)
     -- (Damage, Cooldown)
-    skill_hook:set_skill_properties(1.0, 15)
+    skill_hook:set_skill_properties(2.0, 15)
 
     local skill_ensnaring_net = fishmonger:get_secondary()
     skill_ensnaring_net:set_skill_icon(sFishmongerSkills, 1)
@@ -231,7 +232,7 @@ initialize = function()
         NAMESPACE,
         skill_live_bait.identifier.."2",
         5 * 60,
-        10.0,
+        12.0,
         sFishmongerSkills,
         5,
         sprites.idle,
@@ -333,7 +334,9 @@ initialize = function()
                     local buff_shadow_clone = Buff.find("ror", "shadowClone")
                     for i=0, GM.get_buff_stack(actor, buff_shadow_clone) do
                         local attack = actor:fire_explosion(actor.x + attack_offset, actor.y, hook_width, hook_height, skill_hook.damage, -1, gm.constants.sSparks17_PROV)
-                        
+                        attack.attack_info.stun = 1
+                        attack.attack_info.knockback = 4
+                        attack.attack_info.knockback_direction = actor.image_xscale
                         attack.attack_info:set_stun(0.2)
                         attack.attack_info.climb = i * 8
                     end
@@ -370,7 +373,7 @@ initialize = function()
                     local buff_shadow_clone = Buff.find("ror", "shadowClone")
                     for i=0, GM.get_buff_stack(actor, buff_shadow_clone.value) do
                         local attack = actor:fire_explosion(actor.x + attack_offset, actor.y, hook_width, hook_height, damage, -1, gm.constants.sSparks17_PROV)
-                        --attack.attack_info.stun = 1
+                        attack.attack_info.stun = 1
                         attack.attack_info.knockback = 4
                         attack.attack_info.knockback_direction = -actor.image_xscale
                         attack.attack_info:set_stun(0.2)
@@ -394,7 +397,10 @@ initialize = function()
 ████████      ███        ███      ████      ███  ███   ██       ███  ████  ██  ████  █████  ████
     ------------------------------------------]]--
 
+    
+
     -- Ensnaring net
+    print(sFishmongerNet)
 
     local ensnaring_net = Object.new(NAMESPACE, "fishmongerNet")
     ensnaring_net:set_sprite(sFishmongerNet)
@@ -416,10 +422,24 @@ initialize = function()
         inst.image_speed = 0.15
 
         local actors = inst:get_collisions(gm.constants.pActor)
+
         for _, actor in ipairs(actors) do
             if (actor.team and actor.team ~= selfData.team)
-            or (actor.parent and actor.parent.team and actor.parent.team ~= selfData.parent.team) then
-                GM.apply_buff(actor, 10, ensnaring_net_stun_duration, 1) -- apply stun
+            or (actor.parent and actor.parent.team and actor.parent.team ~= selfData.parent.team)
+            then
+                local ix1 = actor.bbox_left;
+                local iy1 = actor.bbox_top;
+                local ix2 = actor.bbox_right;
+                local iy2 = actor.bbox_bottom;
+                if not ((ix2 < inst.x-10) or (ix1 > inst.x+10) or (iy2 < inst.y-2) or (iy1 > inst.y+2))
+                then
+                    --gm._mod_attack_fire_explosion_noparent(inst.x-3, inst.y-1, 6, 1, 10, 0, 1, -1, gm.constants.sSparks17_PROV)
+                    --gm._mod_attack_fire_explosion_noparent(ix1, iy1, ix2-ix1, iy2-iy1, 10, 0, 1, -1, gm.constants.sSparks17_PROV)
+                    -- I don't get the exact collision calculations
+                    GM.apply_buff(actor, 10, ensnaring_net_stun_duration, 1) -- apply stun
+                    actor.value.vspeed = 0
+                    actor.value.hspeed = 0
+                end
             end
         end
         if selfData.stopped > 0 then
@@ -898,8 +918,10 @@ initialize = function()
     still_fishing_damage:onStep(function(inst)
         local selfData = inst:get_data()
         if inst.image_index < 0.2 then
-            local attack = selfData.parent:fire_explosion(inst.x, inst.y, still_fishing_width, still_fishing_height, skill_still_fishing.damage, -1, gm.constants.sSparks17_PROV)
-            attack.shark_bleed = true
+            print(selfData.parent)
+
+            --local attack = selfData.parent:fire_explosion(inst.x, inst.y, still_fishing_width, still_fishing_height, skill_still_fishing.damage, -1, gm.constants.sSparks17_PROV)
+            --attack.shark_bleed = true
         elseif inst.image_index > 3 then
             inst:destroy()
         end
@@ -910,9 +932,10 @@ initialize = function()
         self:instance_destroy_sync()
 
         if self.is_custom_bait then
-            local inst = still_fishing_damage:create(self.x, self.y)
-            local instData = inst:get_data()
-            instData.parent = self.parent
+            --local inst = still_fishing_damage:create(self.x, self.y)
+            --local instData = inst:get_data()
+            --instData.parent = self.parent
+            inst:fire_explosion(inst.x, inst.y, still_fishing_width, still_fishing_height, skill_still_fishing.damage, -1, gm.constants.sSparks17_PROV)
             return false
         end
         
