@@ -9,7 +9,6 @@ local PATH = _ENV["!plugins_mod_folder_path"]
 local NAMESPACE = "BananaMoray"
 
 initialize = function()
-    gm.object_set_visible(gm.constants.oExplosionAttack, true)
     --[[------------------------------------------
 ░░░░░░░░      ░░░       ░░░       ░░░        ░░        ░░        ░░░      ░░
 ▒▒▒▒▒▒▒  ▒▒▒▒▒▒▒▒  ▒▒▒▒  ▒▒  ▒▒▒▒  ▒▒▒▒▒  ▒▒▒▒▒▒▒▒  ▒▒▒▒▒  ▒▒▒▒▒▒▒▒  ▒▒▒▒▒▒▒
@@ -400,7 +399,6 @@ initialize = function()
     
 
     -- Ensnaring net
-    print(sFishmongerNet)
 
     local ensnaring_net = Object.new(NAMESPACE, "fishmongerNet")
     ensnaring_net:set_sprite(sFishmongerNet)

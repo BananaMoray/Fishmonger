@@ -1,5 +1,7 @@
 
-### v1.0.1
+
+
+### v1.0.1-v1.0.2
 * Buffed her base damage as well as her primary attack damage from 100% to 150%
 * Changed her primary attack to push and then pull her trapped enemies, instead of just pulling which seemed dangerous
 * Fixed her alt special
