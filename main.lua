@@ -1,5 +1,5 @@
 
--- Fishmonger v1.0.0
+-- Fishmonger v1.0.3
 -- Frithuritaks feat. SmoothSpatula
 log.info("Successfully loaded ".._ENV["!guid"]..".")
 
