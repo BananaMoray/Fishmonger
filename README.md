@@ -19,7 +19,7 @@ It works
 
 - Concept, mechanics, all sprites and artworks by Frituritaks
 - Code and sound design by SmoothSpatula
-- The Return of Modding Community for the tools and help
+- The Return of Modding Community for the tools, help and feedback
 
 ## Contact
 

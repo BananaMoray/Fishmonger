@@ -19,7 +19,7 @@ initialize = function()
 
     -- Menu Sprites
 
-    -- Resources.sprite_load(namespace, identifier, path, [img_num], [x_orig], [y_orig])
+    -- Resources.sprite_load(namespace, identifier, path, [img_num], [x_orig], [y_orig], [speed], [bbox_left], [bbox_top], [bbox_right], [bbox_bottom])
     local sFishmongerPortrait = Resources.sprite_load(NAMESPACE, "sFishmongerPortrait", path.combine(PATH, "Sprites", "sFishmongerPortrait.png"), 3)
     local sFishmongerPortraitSmall = Resources.sprite_load(NAMESPACE, "sFishmongerPortraitSmall", path.combine(PATH, "Sprites", "sFishmongerPortraitSmall.png"))
     local sFishmongerPortraitBig = Resources.sprite_load(NAMESPACE, "sFishmongerPortraitBig", path.combine(PATH, "Sprites", "sFishmongerPortraitBig.png"))
@@ -58,6 +58,8 @@ initialize = function()
     local sFishmongerGeyser = Resources.sprite_load(NAMESPACE, "sFishmongerGeyser", path.combine(PATH, "Sprites", "sFishmongerGeyser.png"), 9, 32, 50)
     -- Net
     local sFishmongerNet = Resources.sprite_load(NAMESPACE, "sFishmongerNet", path.combine(PATH, "Sprites", "sFishmongerNet.png"), 7, 48, 19)
+    gm.sprite_set_bbox_mode(sFishmongerNet, 2)
+    gm.sprite_set_bbox(sFishmongerNet, 45, 10, 90, 32)
     -- Live Bait
     local sFishmongerLiveBait = Resources.sprite_load(NAMESPACE, "sFishmongerSpecialFish", path.combine(PATH, "Sprites", "sFishmongerSpecialFish.png"), 8, 12, 19)
     -- Live Bait Boosted
@@ -182,7 +184,7 @@ initialize = function()
     })
     
     fishmonger:set_stats_level({  -- Set the player's leveling stats
-        maxhp = 20,
+        maxhp = 30,
         damage = 4,
         regen = 0.002, -- gain 0.12 health regen per level
         armor = 4
@@ -410,7 +412,9 @@ initialize = function()
         inst.gravity = 0.1
         inst.vspeed = -0.5
         inst.gravity_direction = 270
-
+        inst.image_xscale = inst.image_xscale*1.5
+        inst.image_yscale = inst.image_yscale*1.5
+        inst.image_speed = 0.4
         local selfData = inst:get_data()
         selfData.stopped = 0
     end)
@@ -425,19 +429,9 @@ initialize = function()
             if (actor.team and actor.team ~= selfData.team)
             or (actor.parent and actor.parent.team and actor.parent.team ~= selfData.parent.team)
             then
-                local ix1 = actor.bbox_left;
-                local iy1 = actor.bbox_top;
-                local ix2 = actor.bbox_right;
-                local iy2 = actor.bbox_bottom;
-                if not ((ix2 < inst.x-10) or (ix1 > inst.x+10) or (iy2 < inst.y-2) or (iy1 > inst.y+2))
-                then
-                    --gm._mod_attack_fire_explosion_noparent(inst.x-3, inst.y-1, 6, 1, 10, 0, 1, -1, gm.constants.sSparks17_PROV)
-                    --gm._mod_attack_fire_explosion_noparent(ix1, iy1, ix2-ix1, iy2-iy1, 10, 0, 1, -1, gm.constants.sSparks17_PROV)
-                    -- I don't get the exact collision calculations
-                    GM.apply_buff(actor, 10, ensnaring_net_stun_duration, 1) -- apply stun
-                    actor.value.vspeed = 0
-                    actor.value.hspeed = 0
-                end
+                GM.apply_buff(actor, 10, ensnaring_net_stun_duration, 1) -- apply stun
+                actor.value.vspeed = 0
+                actor.value.hspeed = 0
             end
         end
         if selfData.stopped > 0 then
@@ -454,6 +448,8 @@ initialize = function()
             inst.vspeed = 0
             inst.hspeed = 0
             selfData.stopped = 1
+            inst.image_xscale = 1.2*inst.image_xscale
+            inst.image_yscale = 1.2*inst.image_yscale
         elseif inst.image_index > 5.0 then
             inst.image_index = 4.0
             inst.hspeed = 1.5*inst.image_xscale
@@ -475,7 +471,7 @@ initialize = function()
     state_ensnaring_net:onStep(function(actor, data)
         actor:skill_util_fix_hspeed()
 
-        actor:actor_animation_set(sFishmongerSecondary1, 0.20)
+        actor:actor_animation_set(sFishmongerSecondary1, 0.40)
 
         if data.fired == 0  and actor.image_index >= 6 then
             data.fired = 1
@@ -490,19 +486,17 @@ initialize = function()
                 attack_offset = -attack_offset
             end
             
-            --if gm._mod_net_isHost() then
-                local buff_shadow_clone = Buff.find("ror", "shadowClone")
-                for i=0, GM.get_buff_stack(actor, buff_shadow_clone) do
-                    local net = ensnaring_net:create(actor.x + attack_offset, actor.y - 3)
-                    net.direction = actor:skill_util_facing_direction()
-                    net.image_xscale = gm.cos(gm.degtorad(actor:skill_util_facing_direction()))
-                    net.team = actor.team
-                    net.hspeed = 1.5 * net.image_xscale
-                    local instData = net:get_data()
-                    instData.parent = actor
-                    instData.team = actor.team
-                end
-            --end
+            local buff_shadow_clone = Buff.find("ror", "shadowClone")
+            for i=0, GM.get_buff_stack(actor, buff_shadow_clone) do
+                local net = ensnaring_net:create(actor.x + attack_offset, actor.y - 18)
+                net.direction = actor:skill_util_facing_direction()
+                net.image_xscale = gm.cos(gm.degtorad(actor:skill_util_facing_direction()))
+                net.team = actor.team
+                net.hspeed = 1.5 * net.image_xscale
+                local instData = net:get_data()
+                instData.parent = actor
+                instData.team = actor.team
+            end
 
             
             data.fired = 2

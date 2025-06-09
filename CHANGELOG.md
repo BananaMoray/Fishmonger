@@ -1,4 +1,7 @@
-
+### v1.0.3
+* Change the net's hitbox to fit it's sprite and made the sprite bigger to compensate
+* The net's throw animation has been sped up
+* Fishmonger now gains more life per level, from 20 to 30
 
 
 ### v1.0.1-v1.0.2
