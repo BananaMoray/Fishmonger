@@ -1,11 +1,11 @@
 {
 	"name": "Fishmonger",
-	"version_number": "1.0.3",
+	"version_number": "1.1.0",
 	"website_url": "https://github.com/BananaMoray/Fishmonger/tree/Rewrite",
 	"description": "She has some fish for you.",
 	"dependencies": [
 		"ReturnOfModding-ReturnOfModding-1.0.53",
-		"RoRRModdingToolkit-RoRR_Modding_Toolkit-1.2.0"
-
+		"ReturnsAPI-ReturnsAPI-0.1.54",
+		"LuaENVY-ENVY-1.2.0"
 	]
 }

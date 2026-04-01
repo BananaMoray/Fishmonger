@@ -1,14 +1,18 @@
 
 -- Fishmonger v1.0.3
 -- Frithuritaks feat. SmoothSpatula
-log.info("Successfully loaded ".._ENV["!guid"]..".")
 
-mods["RoRRModdingToolkit-RoRR_Modding_Toolkit"].auto(true)
+local envy = mods["LuaENVY-ENVY"]
+envy.auto()
+mods["ReturnsAPI-ReturnsAPI"].auto{
+    namespace = "fishmonger",
+    mp = true
+}
 
 local PATH = _ENV["!plugins_mod_folder_path"]
-local NAMESPACE = "BananaMoray"
+local NAMESPACE = "fishmonger"
 
-initialize = function()
+local initialize = function()
     --[[------------------------------------------
 ░░░░░░░░      ░░░       ░░░       ░░░        ░░        ░░        ░░░      ░░
 ▒▒▒▒▒▒▒  ▒▒▒▒▒▒▒▒  ▒▒▒▒  ▒▒  ▒▒▒▒  ▒▒▒▒▒  ▒▒▒▒▒▒▒▒  ▒▒▒▒▒  ▒▒▒▒▒▒▒▒  ▒▒▒▒▒▒▒
@@ -19,63 +23,60 @@ initialize = function()
 
     -- Menu Sprites
 
-    -- Resources.sprite_load(namespace, identifier, path, [img_num], [x_orig], [y_orig], [speed], [bbox_left], [bbox_top], [bbox_right], [bbox_bottom])
-    local sFishmongerPortrait = Resources.sprite_load(NAMESPACE, "sFishmongerPortrait", path.combine(PATH, "Sprites", "sFishmongerPortrait.png"), 3)
-    local sFishmongerPortraitSmall = Resources.sprite_load(NAMESPACE, "sFishmongerPortraitSmall", path.combine(PATH, "Sprites", "sFishmongerPortraitSmall.png"))
-    local sFishmongerPortraitBig = Resources.sprite_load(NAMESPACE, "sFishmongerPortraitBig", path.combine(PATH, "Sprites", "sFishmongerPortraitBig.png"))
-    local sFishmongerSkills = Resources.sprite_load(NAMESPACE, "sFishmongerSkills", path.combine(PATH, "Sprites", "sFishmongerSkills.png"), 9)
-    local sSelectFishmonger = Resources.sprite_load(NAMESPACE, "sSelectFishmonger", path.combine(PATH, "Sprites", "sSelectFishmonger.png"), 4, 28, 0)
-
-    local bullet_path = path.combine(PATH, "Sprites", "IWBTSBullet.png")
+    local sFishmongerPortrait = Sprite.new("sFishmongerPortrait", path.combine(PATH, "Sprites", "sFishmongerPortrait.png"), 3)
+    local sFishmongerPortraitSmall = Sprite.new("sFishmongerPortraitSmall", path.combine(PATH, "Sprites", "sFishmongerPortraitSmall.png"))
+    local sFishmongerPortraitBig = Sprite.new("sFishmongerPortraitBig", path.combine(PATH, "Sprites", "sFishmongerPortraitBig.png"))
+    local sFishmongerSkills = Sprite.new("sFishmongerSkills", path.combine(PATH, "Sprites", "sFishmongerSkills.png"), 9)
+    local sSelectFishmonger = Sprite.new("sSelectFishmonger", path.combine(PATH, "Sprites", "sSelectFishmonger.png"), 4, 28, 0)
 
     -- In Game Sprites
     local sprites = {
-        idle = Resources.sprite_load(NAMESPACE, "sFishmongerIdle", path.combine(PATH, "Sprites", "sFishmongerIdle.png"), 10, 26, 19),
-        walk = Resources.sprite_load(NAMESPACE, "sFishmongerWalk", path.combine(PATH, "Sprites", "sFishmongerWalk.png"), 10, 23, 19),
-        jump = Resources.sprite_load(NAMESPACE, "sFishmongerJump", path.combine(PATH, "Sprites", "sFishmongerJump.png"), 2, 26, 19),
-        jump_peak = Resources.sprite_load(NAMESPACE, "sFishmongerJumpPeak", path.combine(PATH, "Sprites", "sFishmongerJumpPeak.png"), 2, 26, 19),
-        fall = Resources.sprite_load(NAMESPACE, "sFishmongerFall", path.combine(PATH, "Sprites", "sFishmongerFall.png"), 1, 26, 19),
-        climb = Resources.sprite_load(NAMESPACE, "sFishmongerClimb", path.combine(PATH, "Sprites", "sFishmongerClimb.png"), 6, 18, 19, 3),
-        death = Resources.sprite_load(NAMESPACE, "sFishmongerDeath", path.combine(PATH, "Sprites", "sFishmongerDeath.png"), 8, 45, 19),
-        decoy = Resources.sprite_load(NAMESPACE, "sFishmongerDummy", path.combine(PATH, "Sprites", "sFishmongerDummy.png"), 1, 16, 15),
-        drone_idle = Resources.sprite_load(NAMESPACE, "sDronePlayerFishmongerIdle", path.combine(PATH, "Sprites", "sDronePlayerFishmongerIdle.png"), 4, 13, 18),
-        drone_shoot = Resources.sprite_load(NAMESPACE, "sDronePlayerFishmongerShoot", path.combine(PATH, "Sprites", "sDronePlayerFishmongerShoot.png"), 4, 42, 18)
+        idle = Sprite.new("sFishmongerIdle", path.combine(PATH, "Sprites", "sFishmongerIdle.png"), 10, 26, 19),
+        walk = Sprite.new("sFishmongerWalk", path.combine(PATH, "Sprites", "sFishmongerWalk.png"), 10, 23, 19),
+        jump = Sprite.new("sFishmongerJump", path.combine(PATH, "Sprites", "sFishmongerJump.png"), 2, 26, 19),
+        jump_peak = Sprite.new("sFishmongerJumpPeak", path.combine(PATH, "Sprites", "sFishmongerJumpPeak.png"), 2, 26, 19),
+        fall = Sprite.new("sFishmongerFall", path.combine(PATH, "Sprites", "sFishmongerFall.png"), 1, 26, 19),
+        climb = Sprite.new("sFishmongerClimb", path.combine(PATH, "Sprites", "sFishmongerClimb.png"), 6, 18, 19, 3),
+        death = Sprite.new("sFishmongerDeath", path.combine(PATH, "Sprites", "sFishmongerDeath.png"), 8, 45, 19),
+        decoy = Sprite.new("sFishmongerDummy", path.combine(PATH, "Sprites", "sFishmongerDummy.png"), 1, 16, 15),
+        drone_idle = Sprite.new("sDronePlayerFishmongerIdle", path.combine(PATH, "Sprites", "sDronePlayerFishmongerIdle.png"), 4, 13, 18),
+        drone_shoot = Sprite.new("sDronePlayerFishmongerShoot", path.combine(PATH, "Sprites", "sDronePlayerFishmongerShoot.png"), 4, 42, 18)
     }
     
 
-    -- local attack1_sprite = Resources.sprite_load(NAMESPACE, "sFishmongerAttack1", path.combine(PATH, "Sprites","sFishmongerAttack1.png"), 14, 44, 35)
-    local sFishmongerPrimary1_1 = Resources.sprite_load(NAMESPACE, "sFishmongerPrimary1_1", path.combine(PATH, "Sprites", "sFishmongerPrimary1_1.png"), 8, 44, 35)
-    local sFishmongerPrimary1_2 = Resources.sprite_load(NAMESPACE, "sFishmongerPrimary1_2", path.combine(PATH, "Sprites", "sFishmongerPrimary1_2.png"), 8, 44, 35)
+    -- local attack1_sprite = Sprite.new("sFishmongerAttack1", path.combine(PATH, "Sprites","sFishmongerAttack1.png"), 14, 44, 35)
+    local sFishmongerPrimary1_1 = Sprite.new("sFishmongerPrimary1_1", path.combine(PATH, "Sprites", "sFishmongerPrimary1_1.png"), 8, 44, 35)
+    local sFishmongerPrimary1_2 = Sprite.new("sFishmongerPrimary1_2", path.combine(PATH, "Sprites", "sFishmongerPrimary1_2.png"), 8, 44, 35)
 
-    local sFishmongerSecondary1 = Resources.sprite_load(NAMESPACE, "sFishmongerSecondary1", path.combine(PATH, "Sprites", "sFishmongerSecondary1.png"), 12, 36, 20)
+    local sFishmongerSecondary1 = Sprite.new("sFishmongerSecondary1", path.combine(PATH, "Sprites", "sFishmongerSecondary1.png"), 12, 36, 20)
 
-    local sFishmongerUtility1 = Resources.sprite_load(NAMESPACE, "sFishmongerUtility1", path.combine(PATH, "Sprites", "sFishmongerUtility1.png"), 9, 23, 19)
-    local sFishmongerSpecial1 = Resources.sprite_load(NAMESPACE, "sFishmongerSpecial1", path.combine(PATH, "Sprites", "sFishmongerSpecial1.png"), 7, 12, 19)
-    local sFishmongerSpecial1Boosted = Resources.sprite_load(NAMESPACE, "sFishmongerSpecial1Boosted", path.combine(PATH, "Sprites", "sFishmongerSpecial1Boosted.png"), 7, 12, 19)
+    local sFishmongerUtility1 = Sprite.new("sFishmongerUtility1", path.combine(PATH, "Sprites", "sFishmongerUtility1.png"), 9, 23, 19)
+    local sFishmongerSpecial1 = Sprite.new("sFishmongerSpecial1", path.combine(PATH, "Sprites", "sFishmongerSpecial1.png"), 7, 12, 19)
+    local sFishmongerSpecial1Boosted = Sprite.new("sFishmongerSpecial1Boosted", path.combine(PATH, "Sprites", "sFishmongerSpecial1Boosted.png"), 7, 12, 19)
     -- bait bucket --
-    local sFishmongerBait = Resources.sprite_load(NAMESPACE, "sFishmongerBait", path.combine(PATH, "Sprites", "sFishmongerBait.png"), 1, 7, 19)
+    local sFishmongerBait = Sprite.new("sFishmongerBait", path.combine(PATH, "Sprites", "sFishmongerBait.png"), 1, 7, 19)
     -- Splash
-    local sFishmongerGeyser = Resources.sprite_load(NAMESPACE, "sFishmongerGeyser", path.combine(PATH, "Sprites", "sFishmongerGeyser.png"), 9, 32, 50)
+    local sFishmongerGeyser = Sprite.new("sFishmongerGeyser", path.combine(PATH, "Sprites", "sFishmongerGeyser.png"), 9, 32, 50)
     -- Net
-    local sFishmongerNet = Resources.sprite_load(NAMESPACE, "sFishmongerNet", path.combine(PATH, "Sprites", "sFishmongerNet.png"), 7, 48, 19)
-    gm.sprite_set_bbox_mode(sFishmongerNet, 2)
-    gm.sprite_set_bbox(sFishmongerNet, 45, 10, 90, 32)
+    local sFishmongerNet = Sprite.new("sFishmongerNet", path.combine(PATH, "Sprites", "sFishmongerNet.png"), 7, 48, 19)
+    gm.sprite_set_bbox_mode(sFishmongerNet.value, 2)
+    gm.sprite_set_bbox(sFishmongerNet.value, 45, 10, 90, 32)
     -- Live Bait
-    local sFishmongerLiveBait = Resources.sprite_load(NAMESPACE, "sFishmongerSpecialFish", path.combine(PATH, "Sprites", "sFishmongerSpecialFish.png"), 8, 12, 19)
+    local sFishmongerLiveBait = Sprite.new("sFishmongerSpecialFish", path.combine(PATH, "Sprites", "sFishmongerSpecialFish.png"), 8, 12, 19)
     -- Live Bait Boosted
-    local sFishmongerLiveBaitBoosted = Resources.sprite_load(NAMESPACE, "sFishmongerSpecialFishBoosted", path.combine(PATH, "Sprites", "sFishmongerSpecialFishBoosted.png"), 4, 24, 24)   
+    local sFishmongerLiveBaitBoosted = Sprite.new("sFishmongerSpecialFishBoosted", path.combine(PATH, "Sprites", "sFishmongerSpecialFishBoosted.png"), 4, 24, 24)   
 
     -- Sprite Offsets
 
     -- Sprite Speeds
-    gm.sprite_set_speed(sprites.idle, 0.65, 1) -- idle animation speed
-    gm.sprite_set_speed(sprites.walk, 0.7, 1) -- walk animation speed
-    gm.sprite_set_speed(sprites.death, 1, 1) 
+    gm.sprite_set_speed(sprites.idle.value, 0.65, 1) -- idle animation speed
+    gm.sprite_set_speed(sprites.walk.value, 0.7, 1) -- walk animation speed
+    gm.sprite_set_speed(sprites.death.value, 1, 1) 
     -- gm.sprite_set_speed(attack1_sprite, 1, 1)
-    gm.sprite_set_speed(sFishmongerUtility1, 1, 1)
-    gm.sprite_set_speed(sFishmongerSpecial1, 1, 1)
-    gm.sprite_set_speed(sFishmongerSpecial1Boosted, 1, 1)
-    gm.sprite_set_speed(sSelectFishmonger, -5, 0) -- loadout Speed
+    gm.sprite_set_speed(sFishmongerUtility1.value, 1, 1)
+    gm.sprite_set_speed(sFishmongerSpecial1.value, 1, 1)
+    gm.sprite_set_speed(sFishmongerSpecial1Boosted.value, 1, 1)
+    gm.sprite_set_speed(sSelectFishmonger.value, -5, 0) -- loadout Speed
 
     --[[------------------------------------------
 ░░░░░░░░      ░░░░      ░░░  ░░░░  ░░   ░░░  ░░       ░░░░      ░░
@@ -85,14 +86,14 @@ initialize = function()
 ████████      ████      ████      ███  ███   ██       ████      ██
     ------------------------------------------]]--
 
-    local sound_select = Resources.sfx_load(NAMESPACE, "FishmongerSelect", path.combine(PATH, "Sounds", "Select.ogg"))
-    local sound_shark_bite = Resources.sfx_load(NAMESPACE, "FishmongerSharkBite", path.combine(PATH, "Sounds", "Cartoon Bite sound effect.ogg"))
-    local sound_splash = Resources.sfx_load(NAMESPACE, "FishmongerSplash", path.combine(PATH, "Sounds", "splash-fx.ogg"))
-    local sound_throw = Resources.sfx_load(NAMESPACE, "FishmongerThrow", path.combine(PATH, "Sounds", "Throw Sound Effect - Free.ogg"))
-    local sound_fishing_net = Resources.sfx_load(NAMESPACE, "FishmongerFishingNet", path.combine(PATH, "Sounds", "Fishing net.ogg"))
-    local sound_whip = Resources.sfx_load(NAMESPACE, "FishmongerWhip", path.combine(PATH, "Sounds", "whip2.ogg"))
-    local sound_fish_throw = Resources.sfx_load(NAMESPACE, "FishmongerFishThrow", path.combine(PATH, "Sounds", "FishThrow.ogg"))
-    local sound_fish_jump = Resources.sfx_load(NAMESPACE, "FishmongerFishJump", path.combine(PATH, "Sounds", "FishJump.ogg"))
+    local sound_select = Sound.new("FishmongerSelect", path.combine(PATH, "Sounds", "Select.ogg"))
+    local sound_shark_bite = Sound.new("FishmongerSharkBite", path.combine(PATH, "Sounds", "Cartoon Bite sound effect.ogg"))
+    local sound_splash = Sound.new("FishmongerSplash", path.combine(PATH, "Sounds", "splash-fx.ogg"))
+    local sound_throw = Sound.new("FishmongerThrow", path.combine(PATH, "Sounds", "Throw Sound Effect - Free.ogg"))
+    local sound_fishing_net = Sound.new("FishmongerFishingNet", path.combine(PATH, "Sounds", "Fishing net.ogg"))
+    local sound_whip = Sound.new("FishmongerWhip", path.combine(PATH, "Sounds", "whip2.ogg"))
+    local sound_fish_throw = Sound.new("FishmongerFishThrow", path.combine(PATH, "Sounds", "FishThrow.ogg"))
+    local sound_fish_jump = Sound.new("FishmongerFishJump", path.combine(PATH, "Sounds", "FishJump.ogg"))
     
     --[[------------------------------------------
 ░░░░░░░░      ░░░        ░░░      ░░░        ░░░      ░░
@@ -102,7 +103,6 @@ initialize = function()
 ████████      ██████  █████  ████  █████  ██████      ██
     ------------------------------------------]]--
 
-    local bullet_speed = 10.0
     local jump_force = 8.0
 
     -- Primary
@@ -165,13 +165,27 @@ initialize = function()
     fishmonger.sprite_credits = sprites.idle
     
     -- The color of the character's skill names in the character select
-    fishmonger:set_primary_color(Color.from_rgb(238, 173, 105))
+    fishmonger.primary_color = Color.from_rgb(238, 173, 105)
     
     -- Set the Prophet cape offset for the survivor
-    fishmonger:set_cape_offset(0, -9, 0, -7)
+    fishmonger.cape_offset = Array.new({0, -9, 0, -7})
 
     -- Set the survivor's sprites to those we previously loaded
-    fishmonger:set_animations(sprites)
+    Callback.add(fishmonger.on_init, function(actor)
+        actor.sprite_idle          = sprites.idle
+        actor.sprite_walk          = sprites.walk
+        --actor.sprite_walk_last     = sprites.walk_last
+        actor.sprite_jump          = sprites.jump
+        actor.sprite_jump_peak     = sprites.jump_peak
+        actor.sprite_fall          = sprites.fall
+        actor.sprite_climb         = sprites.climb
+        actor.sprite_death         = sprites.death
+        actor.sprite_decoy         = sprites.decoy
+        actor.sprite_drone_idle    = sprites.drone_idle
+        actor.sprite_drone_shoot   = sprites.drone_shoot
+        --actor.sprite_climb_hurt    = sprites.climb_hurt
+        --actor.sprite_palette = spr_palette
+    end)
 
     -- Set the survivor's starting stats
     -- (maxhp, damage, regen, armor, attack_speed, critical_chance, maxshield)
@@ -191,7 +205,10 @@ initialize = function()
     })
 
     -- Create survivor log
-    local fishmonger_log = Survivor_Log.new(fishmonger, sFishmongerPortraitBig)
+    local fishmonger_log = SurvivorLog.new_from_survivor(fishmonger)
+    fishmonger_log.portrait_id = sFishmongerPortraitBig
+    fishmonger_log.sprite_id = sprites.walk
+    fishmonger_log.sprite_icon_id = spr_portrait
 
         --[[------------------------------------------
 ░░░░░░░░      ░░░  ░░░░  ░░        ░░  ░░░░░░░░  ░░░░░░░░░      ░░
@@ -201,91 +218,72 @@ initialize = function()
 ████████      ███  ████  ██        ██        ██        ███      ██
     ------------------------------------------]]--
 
+    local skill_hook = fishmonger:get_skills(0)[1]
+    skill_hook.sprite, skill_hook.subimage = sFishmongerSkills, 0
+    skill_hook.damage, skill_hook.cooldown = 2.0, 15
+    skill_hook.is_primary = true
+    skill_hook.require_key_press = false
+    skill_hook.is_utility = false
 
-
-    local skill_hook = fishmonger:get_primary()
-    -- (Sprite Skill, Subimage)
-    skill_hook:set_skill_icon(sFishmongerSkills, 0)
-    -- (Damage, Cooldown)
-    skill_hook:set_skill_properties(2.0, 15)
-
-    local skill_ensnaring_net = fishmonger:get_secondary()
-    skill_ensnaring_net:set_skill_icon(sFishmongerSkills, 1)
-    skill_ensnaring_net:set_skill_properties(2.0, 5* 60)
-    skill_ensnaring_net:set_skill_animation(sprites.idle)
+    local skill_ensnaring_net = fishmonger:get_skills(1)[1]
+    skill_ensnaring_net.sprite, skill_ensnaring_net.subimage = sFishmongerSkills, 1
+    skill_ensnaring_net.damage, skill_ensnaring_net.cooldown = 2.0, 5* 60
+    skill_ensnaring_net.animation = sprites.idle
     skill_ensnaring_net.require_key_press = true
 
-    local skill_splash = fishmonger:get_utility()
-    skill_splash:set_skill_icon(sFishmongerSkills, 2)
-    skill_splash:set_skill_properties(3.0, 4 * 60)
-    skill_splash:set_skill_animation(sFishmongerUtility1)
+    local skill_splash = fishmonger:get_skills(2)[1]
+    skill_splash.sprite, skill_splash.subimage = sFishmongerSkills, 2
+    skill_splash.damage, skill_splash.cooldown = 3.0, 4 * 60
+    skill_splash.animation = sFishmongerUtility1
     skill_splash.require_key_press = true
 
-    local skill_live_bait = fishmonger:get_special()
-    skill_live_bait:set_skill_icon(sFishmongerSkills, 3)
-    skill_live_bait:set_skill_properties(0.8, 10 * 60)
-    skill_live_bait:set_skill_animation(sFishmongerSpecial1)
+    local skill_live_bait = fishmonger:get_skills(3)[1]
+    skill_live_bait.sprite, skill_live_bait.subimage = sFishmongerSkills, 3
+    skill_live_bait.damage, skill_live_bait.cooldown = 0.8, 10 * 60
+    skill_live_bait.animation = sFishmongerSpecial1
     skill_live_bait.require_key_press = true
 
-    --(namespace, identifier, cooldown, damage, sprite_id, sprite_subimage, animation, is_primary, is_utility)
-    -- Create alt special
-    local skill_still_fishing = Skill.new(
-        NAMESPACE,
-        skill_live_bait.identifier.."2",
-        5 * 60,
-        12.0,
-        sFishmongerSkills,
-        5,
-        sprites.idle,
-        false,
-        false
-    )
-    skill_still_fishing.require_key_press = true
-    fishmonger:add_special(skill_still_fishing)
+ -- Create alt special
+    local skill_still_fishing = Skill.new(skill_live_bait.identifier.."2")
+    skill_still_fishing.sprite, skill_still_fishing.subimage = sFishmongerSkills, 5
+    skill_still_fishing.damage, skill_still_fishing.cooldown = 12.0, 5 * 60
+    skill_still_fishing.animation = sprites.idle
+    skill_still_fishing.require_key_press = false
+    skill_still_fishing.is_utility = false
+    --fishmonger:add_skill(3, skill_still_fishing) 
 
     -- Create boosted specials (for scepter)
-    local skill_live_bait_boosted = Skill.new(
-        NAMESPACE,
-        skill_live_bait.identifier.."Boosted",
-        5 * 60,
-        20.0,
-        sFishmongerSkills,
-        4,
-        sFishmongerSpecial1Boosted,
-        false,
-        false
-    )
+    local skill_live_bait_boosted = Skill.new(skill_live_bait.identifier.."Boosted")
+    skill_live_bait_boosted.cooldown = 5 * 60
+    skill_live_bait_boosted.damage = 20.0
+    skill_live_bait_boosted.sprite, skill_live_bait_boosted.subimage = sFishmongerSkills, 4
+    skill_live_bait_boosted.animation = sFishmongerSpecial1Boosted
+    skill_live_bait_boosted. is_primary = false
+    skill_live_bait_boosted.is_utility = false
     skill_live_bait_boosted.require_key_press = true
-    skill_live_bait:set_skill_upgrade(skill_live_bait_boosted)
-    skill_live_bait_boosted:set_skill_properties(3, 5 * 60)
-    skill_live_bait_boosted:set_skill_animation(sFishmongerSpecial1Boosted)
+    skill_live_bait.upgrade_skill = skill_live_bait_boosted
+    skill_live_bait_boosted.damage, skill_live_bait_boosted.cooldown = 3, 5 * 60
+    skill_live_bait_boosted.animation = sFishmongerSpecial1Boosted
 
-    local skill_still_fishing_boosted = Skill.new(
-        NAMESPACE,
-        skill_still_fishing.identifier.."Boosted",
-        5 * 60,
-        20.0,
-        sFishmongerSkills,
-        6,
-        sprites.idle,
-        false,
-        false
-    )
+    local skill_still_fishing_boosted = Skill.new(skill_still_fishing.identifier.."Boosted")
+    skill_still_fishing_boosted.damage, skill_still_fishing_boosted.cooldown = 20.0, 5 * 60
+    skill_still_fishing_boosted.sprite, skill_still_fishing_boosted.subimage = sFishmongerSkills, 6
+    skill_still_fishing_boosted.animation = sprites.idle
+    skill_still_fishing_boosted.is_utility = false
     skill_still_fishing_boosted.require_key_press = true
-    --skill_still_fishing:set_skill_upgrade(skill_still_fishing_boosted)
-    skill_still_fishing:set_skill_upgrade(skill_live_bait_boosted)
+    --skill_still_fishing.upgrade_skill = skill_still_fishing_boosted
+    skill_still_fishing.upgrade_skill = skill_live_bait_boosted
 
 
     -- Create State skill
-    local state_hookA = State.new(NAMESPACE, skill_hook.identifier.."A")
-    local state_hookB = State.new(NAMESPACE, skill_hook.identifier.."B")
-    local state_ensnaring_net = State.new(NAMESPACE, skill_ensnaring_net.identifier)
-    local state_splash = State.new(NAMESPACE, skill_splash.identifier)
-    local state_live_bait = State.new(NAMESPACE, skill_live_bait.identifier)
-    local state_live_bait_boosted = State.new(NAMESPACE, skill_live_bait_boosted.identifier)
-    local state_still_fishing = State.new(NAMESPACE, skill_still_fishing.identifier)
-    local state_still_fishing_boosted = State.new(NAMESPACE, skill_still_fishing_boosted.identifier)
-
+    local state_hookA = ActorState.new(skill_hook.identifier.."A")
+    local state_hookB = ActorState.new(skill_hook.identifier.."B")
+    local state_ensnaring_net = ActorState.new(skill_ensnaring_net.identifier)
+    local state_splash = ActorState.new(skill_splash.identifier)
+    local state_live_bait = ActorState.new(skill_live_bait.identifier)
+    local state_live_bait_boosted = ActorState.new(skill_live_bait_boosted.identifier)
+    local state_still_fishing = ActorState.new(skill_still_fishing.identifier)
+    local state_still_fishing_boosted = ActorState.new(skill_still_fishing_boosted.identifier)
 
     --[[------------------------------------------
 ░░░░░░░       ░░░       ░░░        ░░  ░░░░  ░░░      ░░░       ░░░  ░░░░  ░
@@ -297,30 +295,31 @@ initialize = function()
 
     local fishmonger_decr_counter = nil
     fishmonger_decr_counter = function(actor)
-        if actor.fishmonger_count == 0 then return end
+        local actorData = Instance.get_data(actor)
+        if actorData.fishmonger_count == 0 then return end
 
-        actor.fishmonger_count = actor.fishmonger_count - 1
-        Alarm.create(fishmonger_decr_counter, 1, actor)
+        actorData.fishmonger_count = actorData.fishmonger_count - 1
+        Alarm.add(1, fishmonger_decr_counter, actor)
     end
 
-    skill_hook:onActivate(function(actor, skill, index)
-
-        if actor.fishmonger_count == 0 then
-            GM.actor_set_state(actor, state_hookA.value)
-            actor.fishmonger_count = hook_combo_counter
-            Alarm.create(fishmonger_decr_counter, 1, actor)
+    Callback.add(skill_hook.on_activate, function(actor, skill, index)
+        local actorData = Instance.get_data(actor)
+        if actorData.fishmonger_count == 0 then
+            actor:set_state(state_hookA)
+            actorData.fishmonger_count = hook_combo_counter
+            Alarm.add(1, fishmonger_decr_counter, actor)
         else
-            actor.fishmonger_count = 0
-            GM.actor_set_state(actor, state_hookB.value)
+            actorData.fishmonger_count = 0
+            actor:set_state(state_hookB)
         end
     end)
 
-    state_hookA:onEnter(function(actor, data)
+    Callback.add(state_hookA.on_enter, function(actor, data)
         actor.image_index = 0
         data.fired = 0
     end)
 
-    state_hookA:onStep(function(actor, data)
+    Callback.add(state_hookA.on_step, function(actor, data)
         actor:skill_util_fix_hspeed()
         actor:actor_animation_set(sFishmongerPrimary1_1, 0.25)
         if data.fired == 0 and actor.image_index >= 3 then
@@ -332,19 +331,16 @@ initialize = function()
             
             if gm._mod_net_isHost() then
                 if not actor:skill_util_update_heaven_cracker(actor, skill_hook.damage) then
-                    local buff_shadow_clone = Buff.find("ror", "shadowClone")
-                    for i=0, GM.get_buff_stack(actor, buff_shadow_clone) do
+                    local buff_shadow_clone = Buff.find("shadowClone", "ror")
+                    for i=0, actor:buff_count(buff_shadow_clone) do
                         local attack = actor:fire_explosion(actor.x + attack_offset, actor.y, hook_width, hook_height, skill_hook.damage, -1, gm.constants.sSparks17_PROV)
-                        attack.attack_info.stun = 1
+                        attack.attack_info.stun = 0.2
                         attack.attack_info.knockback = 4
                         attack.attack_info.knockback_direction = actor.image_xscale
-                        attack.attack_info:set_stun(0.2)
                         attack.attack_info.climb = i * 8
                     end
                 end
-                
             end
-
             actor:sound_play(sound_whip, 2, 0.6 + math.random() * 0.4)
             data.fired = 1
         end
@@ -352,12 +348,12 @@ initialize = function()
         actor:skill_util_exit_state_on_anim_end()
     end)
 
-    state_hookB:onEnter(function(actor, data)
+    Callback.add(state_hookB.on_enter, function(actor, data)
         actor.image_index = 0
         data.fired = 0
     end)
 
-    state_hookB:onStep(function(actor, data)
+    Callback.add(state_hookB.on_step, function(actor, data)
         actor:skill_util_fix_hspeed()
         actor:actor_animation_set(sFishmongerPrimary1_2, 0.25)
 
@@ -371,13 +367,12 @@ initialize = function()
 
             if gm._mod_net_isHost() then
                 if not actor:skill_util_update_heaven_cracker(actor, damage) then
-                    local buff_shadow_clone = Buff.find("ror", "shadowClone")
+                    local buff_shadow_clone = Buff.find("shadowClone", "ror")
                     for i=0, GM.get_buff_stack(actor, buff_shadow_clone.value) do
                         local attack = actor:fire_explosion(actor.x + attack_offset, actor.y, hook_width, hook_height, damage, -1, gm.constants.sSparks17_PROV)
-                        attack.attack_info.stun = 1
+                        attack.attack_info.stun = 0.2
                         attack.attack_info.knockback = 4
                         attack.attack_info.knockback_direction = -actor.image_xscale
-                        attack.attack_info:set_stun(0.2)
                         attack.attack_info.climb = i * 8
                     end
                 end
@@ -398,15 +393,13 @@ initialize = function()
 ████████      ███        ███      ████      ███  ███   ██       ███  ████  ██  ████  █████  ████
     ------------------------------------------]]--
 
-    
-
     -- Ensnaring net
 
-    local ensnaring_net = Object.new(NAMESPACE, "fishmongerNet")
+    local ensnaring_net = Object.new("fishmongerNet")
     ensnaring_net:set_sprite(sFishmongerNet)
-    ensnaring_net:set_depth(1)
+    ensnaring_net:set_depth(-10)
 
-    ensnaring_net:onCreate(function(inst)
+    Callback.add(ensnaring_net.on_create, function(inst)
         inst.image_index = 0
         inst.floored = 0
         inst.gravity = 0.1
@@ -415,12 +408,12 @@ initialize = function()
         inst.image_xscale = inst.image_xscale*1.5
         inst.image_yscale = inst.image_yscale*1.5
         inst.image_speed = 0.4
-        local selfData = inst:get_data()
+        local selfData = Instance.get_data(inst)
         selfData.stopped = 0
     end)
 
-    ensnaring_net:onStep(function(inst)
-        local selfData = inst:get_data()
+    Callback.add(ensnaring_net.on_step, function(inst)
+        local selfData = Instance.get_data(inst)
         inst.image_speed = 0.15
 
         local actors = inst:get_collisions(gm.constants.pActor)
@@ -459,16 +452,16 @@ initialize = function()
 
     -- Skill
 
-    skill_ensnaring_net:onActivate(function(actor, skill, index)
-        GM.actor_set_state(actor, state_ensnaring_net)
+    Callback.add(skill_ensnaring_net.on_activate, function(actor, skill, index)
+        actor:set_state(state_ensnaring_net)
     end)
 
-    state_ensnaring_net:onEnter(function(actor, data)
+    Callback.add(state_ensnaring_net.on_enter, function(actor, data)
         actor.image_index = 0
         data.fired = 0
     end)
 
-    state_ensnaring_net:onStep(function(actor, data)
+    Callback.add(state_ensnaring_net.on_step, function(actor, data)
         actor:skill_util_fix_hspeed()
 
         actor:actor_animation_set(sFishmongerSecondary1, 0.40)
@@ -486,14 +479,14 @@ initialize = function()
                 attack_offset = -attack_offset
             end
             
-            local buff_shadow_clone = Buff.find("ror", "shadowClone")
-            for i=0, GM.get_buff_stack(actor, buff_shadow_clone) do
+            local buff_shadow_clone = Buff.find("shadowClone", "ror")
+            for i=0, actor:buff_count(buff_shadow_clone) do
                 local net = ensnaring_net:create(actor.x + attack_offset, actor.y - 18)
                 net.direction = actor:skill_util_facing_direction()
                 net.image_xscale = gm.cos(gm.degtorad(actor:skill_util_facing_direction()))
                 net.team = actor.team
                 net.hspeed = 1.5 * net.image_xscale
-                local instData = net:get_data()
+                local instData = Instance.get_data(net)
                 instData.parent = actor
                 instData.team = actor.team
             end
@@ -505,7 +498,6 @@ initialize = function()
         actor:skill_util_exit_state_on_anim_end()
     end)
 
-
     --[[------------------------------------------
 ░░░░░░░  ░░░░  ░░        ░░        ░░  ░░░░░░░░        ░░        ░░  ░░░░  ░
 ▒▒▒▒▒▒▒  ▒▒▒▒  ▒▒▒▒▒  ▒▒▒▒▒▒▒▒  ▒▒▒▒▒  ▒▒▒▒▒▒▒▒▒▒▒  ▒▒▒▒▒▒▒▒  ▒▒▒▒▒▒  ▒▒  ▒▒
@@ -515,35 +507,35 @@ initialize = function()
     ------------------------------------------]]--
 
     -- Splash Object
-    local splash = Object.new(NAMESPACE, "fishmongerSplash")
+    local splash = Object.new("fishmongerSplash")
     splash:set_sprite(sFishmongerGeyser)
     splash:set_depth(1)
 
-    splash:onCreate(function(inst)
+    Callback.add(splash.on_create, function(inst)
         inst.image_index = 0
         inst.knockup_force = splash_knockup_force
         inst.damage = splash_damage
         inst.fired = 0
     end)
 
-    splash:onStep(function(inst)
+    Callback.add(splash.on_step, function(inst)
         inst.image_speed = 0.25
         if inst.image_index >= 8.0 then
             inst:destroy()
         end
     end)
 
-    skill_splash:onActivate(function(actor, skill, index)
-        GM.actor_set_state(actor, state_splash)
+    Callback.add(skill_splash.on_activate, function(actor, skill, index)
+        actor:set_state(state_splash)
     end)
 
-    state_splash:onEnter(function(actor, data)
+    Callback.add(state_splash.on_enter, function(actor, data)
         actor.image_index = 0
         data.fired = 0
         data.slide = 0
     end)
 
-    state_splash:onStep(function(actor, data)
+    Callback.add(state_splash.on_step, function(actor, data)
         actor:skill_util_fix_hspeed()
 
         actor:actor_animation_set(actor:actor_get_skill_animation(skill_splash.value), 0.25)
@@ -556,14 +548,14 @@ initialize = function()
                 attack_offset = -attack_offset
             end
 
-            local buff_shadow_clone = Buff.find("ror", "shadowClone")
-            for i=0, GM.get_buff_stack(actor, buff_shadow_clone) do
+            local buff_shadow_clone = Buff.find("shadowClone", "ror")
+            for i=0, actor:buff_count(buff_shadow_clone) do
                 local attack = actor:fire_explosion(actor.x + attack_offset, actor.y, splash_width, splash_height, damage, -1, gm.constants.sSparks17_PROV)
                 
-                attack.attack_info.stun = 1 -- change stun duration?
+                attack.attack_info.stun = 0.5 -- change stun duration?
                 attack.attack_info.climb = i * 8
-                attack.splashed = true
-                attack.splashed_direction = gm.cos(gm.degtorad(actor:skill_util_facing_direction()))
+                attack.attack_info.splashed = true
+                attack.attack_info.splashed_direction = gm.cos(gm.degtorad(actor:skill_util_facing_direction()))
 
                 local wave = splash:create(actor.x + attack_offset, actor.y)
                 wave.image_xscale = gm.cos(gm.degtorad(actor:skill_util_facing_direction()))
@@ -592,12 +584,11 @@ initialize = function()
         actor:skill_util_exit_state_on_anim_end()
     end)
 
+    Callback.add(Callback.ON_HIT_PROC, function(attacker, target, hit_info)
+        if not hit_info.attack_info.splashed or target.dead == nil then return end
 
-    fishmonger:add_instance_callback(function(obj_inst, hit_inst, hit_x, hit_y)
-        if not obj_inst.splashed or hit_inst.dead == nil then return end
-
-        hit_inst.pVspeed = hit_inst.pVspeed - 10
-        hit_inst.pHspeed = hit_inst.pHspeed - (4 * obj_inst.splashed_direction)
+       target.pVspeed = target.pVspeed - 10
+       target.pHspeed = target.pHspeed - (4 * hit_info.attack_info.splashed_direction)
     end)
 
         --[[------------------------------------------
@@ -617,12 +608,12 @@ initialize = function()
     ------------------------------------------]]--
 
     -- Fishies
-    local live_bait = Object.new(NAMESPACE, "fishmongerLiveBait")
+    local live_bait = Object.new("fishmongerLiveBait")
     live_bait:set_sprite(sFishmongerLiveBait)
     live_bait:set_depth(1)
 
-    live_bait:onCreate(function(inst)
-        local selfData = inst:get_data()
+    Callback.add(live_bait.on_create, function(inst)
+        local selfData = Instance.get_data(inst)
         selfData.nb = math.random(0, 3) * 2
         selfData.duration = 200
         selfData.lastDamaged = 0
@@ -636,8 +627,8 @@ initialize = function()
         selfData.image_index_offset = 0
     end)
 
-    live_bait:onStep(function(inst)
-        local selfData = inst:get_data()
+    Callback.add(live_bait.on_step, function(inst)
+        local selfData = Instance.get_data(inst)
 
         inst.image_angle = inst.image_angle + 3*inst.image_xscale
 
@@ -683,22 +674,19 @@ initialize = function()
 
     -- Skill
 
-    skill_live_bait:onActivate(function(actor, skill, index)
-        GM.actor_set_state(actor, state_live_bait)
+    Callback.add(skill_live_bait.on_activate, function(actor, skill, index)
+        actor:set_state(state_live_bait)
     end)
 
-    state_live_bait:onEnter(function(actor, data)
+    Callback.add(state_live_bait.on_enter, function(actor, data)
         actor.image_index = 0
         data.fired = 0
     end)
 
-    state_live_bait:onStep(function(actor, data)
+    Callback.add(state_live_bait.on_step, function(actor, data)
         actor:skill_util_fix_hspeed()
 
         actor:actor_animation_set(sFishmongerSpecial1, 0.25)
-
-
-        
         if data.fired == 0 and actor.image_index >=2 then
             actor:sound_play(sound_fish_throw, 1, 0.9 + math.random() * 0.2)
             data.fired = 1
@@ -712,8 +700,8 @@ initialize = function()
                 attack_offset = -attack_offset
             end
             
-            local buff_shadow_clone = Buff.find("ror", "shadowClone")
-            for i=0, GM.get_buff_stack(actor, buff_shadow_clone) do
+            local buff_shadow_clone = Buff.find("shadowClone", "ror")
+            for i=0, actor:buff_count(buff_shadow_clone) do
                 for i=0, live_bait_number-1 do
                     local fishie = live_bait:create(actor.x + attack_offset, actor.y - math.random()*40.0 )
                     fishie.direction = actor:skill_util_facing_direction()
@@ -729,7 +717,7 @@ initialize = function()
                     
                     fishie.image_yscale = live_bait_scale
 
-                    local instData = fishie:get_data()
+                    local instData = Instance.get_data(fishie)
                     instData.parent = actor
                     instData.team = actor.team
                 end
@@ -751,12 +739,12 @@ initialize = function()
 
     
     -- Shark
-    local live_bait_boosted = Object.new(NAMESPACE, "fishmongerLiveBaitBoosted")
+    local live_bait_boosted = Object.new("fishmongerLiveBaitBoosted")
     live_bait_boosted:set_sprite(sFishmongerLiveBaitBoosted)
     live_bait_boosted:set_depth(1)
 
-    live_bait_boosted:onCreate(function(inst)
-        local selfData = inst:get_data()
+    Callback.add(live_bait_boosted.on_create, function(inst)
+        local selfData = Instance.get_data(inst)
         selfData.duration = live_bait_boosted_duration
 
         inst.hspeed = 2 * inst.image_xscale
@@ -766,20 +754,20 @@ initialize = function()
 
         selfData.previous_x = inst.x
         selfData.previous_y = inst.y
-        selfData.chomp = false
+        selfData.chomp = 2
     end)
 
-    live_bait_boosted:onStep(function(inst)
-        local selfData = inst:get_data()
+    Callback.add(live_bait_boosted.on_step, function(inst)
+        local selfData = Instance.get_data(inst)
 
         -- Attack
-        if inst.image_index >= 2.0 and not selfData.chomp then 
-            local attack = selfData.parent:fire_explosion(inst.x, inst.y, live_bait_boosted_width, live_bait_boosted_height, skill_live_bait_boosted.damage, -1, gm.constants.sSparks17_PROV)
-            attack.shark_bleed = true
-            attack.execute = true
-            selfData.chomp = true
+        if inst.image_index >= 2.0 and selfData.chomp<=0 then 
+            selfData.chomp = 5
+            local attack = selfData.parent:fire_explosion(inst.x, inst.y, live_bait_boosted_width, live_bait_boosted_height, skill_live_bait_boosted.damage, -1, gm.constants.sSparks17_PROV, true)
+            attack.attack_info.shark_bleed = true
+            attack.attack_info.execute = true
         else 
-            selfData.chomp = false
+            selfData.chomp = selfData.chomp - 1 
         end
 
         -- Collisions
@@ -814,16 +802,16 @@ initialize = function()
 
     -- Skill
 
-    skill_live_bait_boosted:onActivate(function(actor, skill, index)
-        GM.actor_set_state(actor, state_live_bait_boosted)
+    Callback.add(skill_live_bait_boosted.on_activate, function(actor, skill, index)
+        actor:set_state(state_live_bait_boosted)
     end)
 
-    state_live_bait_boosted:onEnter(function(actor, data)
+    Callback.add(state_live_bait_boosted.on_enter, function(actor, data)
         actor.image_index = 0
         data.fired = 0
     end)
 
-    state_live_bait_boosted:onStep(function(actor, data)
+    Callback.add(state_live_bait_boosted.on_step, function(actor, data)
         actor:skill_util_fix_hspeed()
 
         actor:actor_animation_set(sFishmongerSpecial1Boosted, 0.25)
@@ -840,8 +828,8 @@ initialize = function()
                 attack_offset = -attack_offset
             end
             
-            local buff_shadow_clone = Buff.find("ror", "shadowClone")
-            for i=0, GM.get_buff_stack(actor, buff_shadow_clone) do
+            local buff_shadow_clone = Buff.find("shadowClone", "ror")
+            for i=0, actor:buff_count(buff_shadow_clone) do
                 local shark = live_bait_boosted:create(actor.x + attack_offset, actor.y - 1.1)
                 shark.direction = actor:skill_util_facing_direction()
                 shark.parent = actor
@@ -855,7 +843,7 @@ initialize = function()
                     shark.gravity_direction = 267
                 end
 
-                local instData = shark:get_data()
+                local instData = Instance.get_data(shark)
                 instData.parent = actor
                 instData.team = actor.team
             end
@@ -865,24 +853,26 @@ initialize = function()
         actor:skill_util_exit_state_on_anim_end()
     end)
 
-    fishmonger:add_instance_callback(function(obj_inst, hit_inst, hit_x, hit_y)
-        if not obj_inst.shark_bleed or hit_inst.dead == nil then return end
+    Callback.add(Callback.ON_HIT_PROC, function(attacker, target, hit_info)
+        if not hit_info.attack_info.shark_bleed or target.dead == true then return end
 
-        hit_inst:sound_play(sound_shark_bite, 0.8, 2.0)
-        if hit_inst.hp*5 < hit_inst.maxhp and obj_inst.execute then --kill enemies under 20% hp
-            hit_inst:kill()
+        print("applying bleed")
+
+        target:sound_play(sound_shark_bite, 0.8, 2.0)
+        if target.hp*5 < target.maxhp and hit_info.attack_info.execute then --kill enemies under 20% hp
+            target:kill()
         end
-    
-        local dot = GM.instance_create(hit_x, hit_y, gm.constants.oDot)
-        dot.target = hit_inst.id
-        dot.parent = obj_inst.attack_info.parent.id
-        dot.damage = obj_inst.attack_info.damage /4
+        local dot = GM.instance_create(hit_info.attack_info.x, hit_info.attack_info.y, gm.constants.oDot)
+        dot.target = target.id
+        dot.parent = hit_info.attack_info.parent.id
+        dot.damage = hit_info.attack_info.damage /4
         dot.ticks = 4
-        dot.team = obj_inst.attack_info.team
+        dot.team = hit_info.attack_info.team
         dot.textColor = Color.from_rgb(120, 6, 6)
         dot.sprite_index = gm.constants.sSparks9
     end)
 
+    if 1==1 then return end -- yeah this ending skill aint ready sorry
     --[[--------------------------------------
 ░░░░░░░       ░░░░      ░░░        ░░        ░
 ▒▒▒▒▒▒▒  ▒▒▒▒  ▒▒  ▒▒▒▒  ▒▒▒▒▒  ▒▒▒▒▒▒▒▒  ▒▒▒▒
@@ -899,16 +889,16 @@ initialize = function()
         -- inst.hp = the hp you want
     end
 
-    local  still_fishing_damage = Object.new(NAMESPACE, "fishmongerStillFishing")
+    local still_fishing_damage = Object.new("fishmongerStillFishing")
     still_fishing_damage:set_sprite(sFishmongerLiveBaitBoosted) -- change this sprite
     still_fishing_damage:set_depth(1)
 
-    still_fishing_damage:onCreate(function(inst)
+    Callback.add(still_fishing_damage.on_create, function(inst)
         inst.image_speed = 0.25
     end)
 
-    still_fishing_damage:onStep(function(inst)
-        local selfData = inst:get_data()
+    Callback.add(still_fishing_damage.on_step, function(inst)
+        local selfData = Instance.get_data(inst)
         if inst.image_index < 0.2 then
             print(selfData.parent)
 
@@ -924,9 +914,10 @@ initialize = function()
         self:instance_destroy_sync()
 
         if self.is_custom_bait then
-            --local inst = still_fishing_damage:create(self.x, self.y)
-            --local instData = inst:get_data()
-            --instData.parent = self.parent
+            -- local inst = still_fishing_damage:create(self.x, self.y)
+            -- local instData = inst:get_data()
+            -- instData.parent = self.parent
+            inst = self.parent
             inst:fire_explosion(inst.x, inst.y, still_fishing_width, still_fishing_height, skill_still_fishing.damage, -1, gm.constants.sSparks17_PROV)
             return false
         end
@@ -935,16 +926,16 @@ initialize = function()
 
     -- skill
 
-    skill_still_fishing:onActivate(function(actor, skill, index)
-        GM.actor_set_state(actor, state_still_fishing)
+    Callback.add(skill_still_fishing.on_activate, function(actor, skill, index)
+        actor:set_state(state_still_fishing)
     end)
 
-    state_still_fishing:onEnter(function(actor, data)
+    Callback.add(state_still_fishing.on_enter, function(actor, data)
         actor.image_index = 0
         data.fired = 0
     end)
 
-    state_still_fishing:onStep(function(actor, data)
+    Callback.add(state_still_fishing.on_step, function(actor, data)
         actor:skill_util_fix_hspeed()
 
         actor:actor_animation_set(sFishmongerSpecial1, 0.25) -- change to Special2
@@ -955,15 +946,15 @@ initialize = function()
                 attack_offset = -attack_offset
             end
             
-            local buff_shadow_clone = Buff.find("ror", "shadowClone")
-            for i=0, GM.get_buff_stack(actor, buff_shadow_clone) do
+            local buff_shadow_clone = Buff.find("shadowClone", "ror")
+            for i=0, actor:buff_count(buff_shadow_clone) do
                 -- create an oArtiSnap and repurpose it
                 local inst = still_fishing_bait:create(actor.x, actor.y)
                 inst.parent = actor.value
                 inst.sprite_index = sFishmongerBait
                 -- inst.hp = the hp you want
-                Alarm.create(set_still_fishing, 1, inst, actor.value)
-                Alarm.create(set_still_fishing, 2, inst, actor.value)
+                Alarm.add(1, set_still_fishing, inst, actor.value)
+                Alarm.add(2, set_still_fishing,  inst, actor.value)
             end
 
             actor:sound_play(gm.constants.wGeyser, 1, 0.9 + math.random() * 0.2)
@@ -976,4 +967,4 @@ initialize = function()
 
 end
 
-Initialize(initialize)
+Initialize.add_hotloadable(initialize)

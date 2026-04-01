@@ -1,3 +1,7 @@
+### v1.1.0
+* Ported to ReturnsAPI
+* Disabled the alt special for now
+
 ### v1.0.3
 * Change the net's hitbox to fit it's sprite and made the sprite bigger to compensate
 * The net's throw animation has been sped up
