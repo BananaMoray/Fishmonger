@@ -1,3 +1,6 @@
+### v1.1.1
+* Fixed log
+
 ### v1.1.0
 * Ported to ReturnsAPI
 * Disabled the alt special for now

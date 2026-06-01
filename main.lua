@@ -208,7 +208,7 @@ local initialize = function()
     local fishmonger_log = SurvivorLog.new_from_survivor(fishmonger)
     fishmonger_log.portrait_id = sFishmongerPortraitBig
     fishmonger_log.sprite_id = sprites.walk
-    fishmonger_log.sprite_icon_id = spr_portrait
+    fishmonger_log.sprite_icon_id = sFishmongerPortrait
 
         --[[------------------------------------------
 ░░░░░░░░      ░░░  ░░░░  ░░        ░░  ░░░░░░░░  ░░░░░░░░░      ░░
